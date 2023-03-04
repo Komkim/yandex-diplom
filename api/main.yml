@@ -1,0 +1,227 @@
+openapi: 3.0.0
+info:
+  title: yandex diplom API
+  description: Выпускная работа по специальности go разработчик на яндекс практикуме
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:8080
+    description: local server
+
+paths:
+  /api/user/register:
+    post:
+      summary: Add a new pet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+              example:
+                login: login
+                password: password
+      responses:
+        200:
+          description: пользователь успешно зарегистрирован и аутентифицирован
+        400:
+          description: неверный формат запроса
+        409:
+          description: логин уже занят
+        500:
+          description: внутренняя ошибка
+
+  /api/user/login:
+    post:
+      summary: Аутентификация пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+              example:
+                login: login
+                password: password
+      responses:
+        200:
+          description: пользователь успешно аутентифицирован
+        400:
+          description: неверный формат запроса
+        401:
+          description: неверная пара логин/пароль
+        500:
+          description: внутренняя ошибка
+
+
+  /api/user/orders:
+    post:
+      summary: Загрузка номера заказа
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        200:
+          description: номер заказа уже был загружен этим пользователем
+        202:
+          description: новый номер заказа принят в обработку
+        400:
+          description: неверный формат запроса
+        401:
+          description: пользователь не аутентифицирован
+        409:
+          description: номер заказа уже был загружен другим пользователем
+        422:
+          description: неверный формат номера заказа
+        500:
+          description: внутренняя ошибка
+
+    get:
+      summary: Получение списка загруженных номеров заказов
+
+      responses:
+        200:
+          description: успешная обработка запроса
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    number:
+                      type: integer
+                    status:
+                      type: string
+                      enum: [NEW, PROCESSING, INVALID, PROCESSED]
+                    accrual:
+                      type: integer
+                    uploaded_at:
+                      type: string
+        204:
+          description: нет данных для ответа
+        401:
+          description: пользователь не авторизован
+        500:
+          description: внутренняя ошибка
+
+
+  /api/user/balance:
+    get:
+      summary: Получение текущего баланса пользователя
+
+      responses:
+        200:
+          description: успешная обработка запроса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: number
+                  withdrawn:
+                    type: integer
+        401:
+          description: пользователь не авторизован
+        500:
+          description: внутренняя ошибка сервера
+
+  /api/user/balance/withdraw:
+    post:
+      summary: Запрос на списание средств
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order:
+                  type: integer
+                sum:
+                  type: integer
+      responses:
+        200:
+          description: успешная обработка запроса
+        401:
+          description: пользователь не авторизован
+        402:
+          description: на счету недостаточно средств
+        422:
+          description: неверный номер заказа
+        500:
+          description: внутренняя ошибка сервера
+
+  /api/user/withdrawals:
+    get:
+      summary: Получение информации о выводе средств
+
+      responses:
+        200:
+          description: успешная обработка запроса
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    order:
+                      type: integer
+                    sum:
+                      type: integer
+                    processed_at:
+                      type: string
+        204:
+          description: нет ни одного списания
+        401:
+          description: пользователь не авторизован
+        500:
+          description: внутренняя ошибка сервера
+
+  /api/orders/{orderId}:
+    get:
+      parameters:
+        - in: path
+          name: orderId   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The user ID
+      responses:
+        200:
+          description: успешная обработка запроса
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    order:
+                      type: integer
+                    status:
+                      type: string
+                      enum: [NEW, PROCESSING, INVALID, PROCESSED]
+                    accrual:
+                      type: integer
+        204:
+          description: заказ не зарегистрирован в системе расчёта
+        429:
+          description: превышено количество запросов к сервису
+        500:
+          description: внутренняя ошибка
+
+
+
