@@ -14,7 +14,7 @@ func upCreateBalance(tx *sql.Tx) error {
 			create table balance
 			(
 				id        serial not null primary key,
-				user_id   serial REFERENCES user (id),						
+				user_id   serial REFERENCES users (id),						
 				number	  integer not null,				
 				current double precision,
 				withdraw double precision,
