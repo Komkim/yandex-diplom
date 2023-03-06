@@ -14,7 +14,7 @@ func upCreateOrders(tx *sql.Tx) error {
 			create table orders
 			(
 				id        serial not null primary key,
-				user_id   serial REFERENCES user (id),
+				user_id   serial REFERENCES users (id),
 				balance_id serial REFERENCES balance (id),				
 				number	  integer not null,
 				status status not null,

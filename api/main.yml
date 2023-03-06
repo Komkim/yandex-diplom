@@ -191,6 +191,8 @@ paths:
 
   /api/orders/{orderId}:
     get:
+      summary: Получение информации о расчёте начислений баллов лояльности
+
       parameters:
         - in: path
           name: orderId   # Note the name is the same as in the path
