@@ -13,9 +13,9 @@ func upCreateOrders(tx *sql.Tx) error {
 	_, err := tx.Exec(`
 			create table orders
 			(
-				id        serial not null primary key,
-				user_id   serial REFERENCES users (id),
-				balance_id serial REFERENCES balance (id),				
+				id        uuid not null primary key,
+				user_id   uuid REFERENCES users (id),
+				balance_id uuid REFERENCES balance (id),				
 				number	  integer not null,
 				status status not null,
 				accrual double precision,
