@@ -36,17 +36,8 @@ func main() {
 		log.Error().Err(err)
 	}
 
-	s := storage.NewStorage(
-		application.NewOrdersService(),
-		application.NewBalanceService(),
-		application.NewUsersService(),
-	)
-
-	service := application.NewServices()
-
+	service := application.NewServices(ctx, &cfg.Server, log.Log())
 	r := router.NewRouter(&cfg.Server, service)
-	//r := router.NewRouter(&cfg.Server,s)
-
 	srv := server.NewServer(&cfg.HTTP, log.Log(), r.Init())
 
 	quit := make(chan os.Signal, 1)

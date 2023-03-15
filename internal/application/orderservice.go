@@ -9,8 +9,8 @@ type OrdersService struct {
 	Orders entity.Orders
 }
 
-func NewOrdersService() *OrdersService {
-	return &OrdersService{}
+func NewOrdersService() OrdersService {
+	return OrdersService{}
 }
 
 func (o *OrdersService) SetOrderNumber(number string) error {
