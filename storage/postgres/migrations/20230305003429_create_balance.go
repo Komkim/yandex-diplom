@@ -13,8 +13,8 @@ func upCreateBalance(tx *sql.Tx) error {
 	_, err := tx.Exec(`
 			create table balance
 			(
-				id        serial not null primary key,
-				user_id   serial REFERENCES users (id),						
+				id        uuid not null primary key,
+				user_id   uuid REFERENCES users (id),						
 				number	  integer not null,				
 				current double precision,
 				withdraw double precision,
