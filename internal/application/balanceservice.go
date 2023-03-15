@@ -9,8 +9,8 @@ type BalanceService struct {
 	Balance *entity.Balance
 }
 
-func NewBalanceService() *BalanceService {
-	return &BalanceService{}
+func NewBalanceService() BalanceService {
+	return BalanceService{}
 }
 
 func (b *BalanceService) GetBalance() (storage.Balance, error) {

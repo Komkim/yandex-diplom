@@ -3,8 +3,8 @@ package application
 type UsersService struct {
 }
 
-func NewUsersService() *UsersService {
-	return &UsersService{}
+func NewUsersService() UsersService {
+	return UsersService{}
 }
 
 func (u *UsersService) Register(login, password string) error {

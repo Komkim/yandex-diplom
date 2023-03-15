@@ -3,7 +3,7 @@ package router
 import "net/http"
 
 func (t *Router) UserRegister(w http.ResponseWriter, r *http.Request) {
-
+	t.storage.Register()
 }
 
 func (t *Router) UserAuthentication(w http.ResponseWriter, r *http.Request) {
