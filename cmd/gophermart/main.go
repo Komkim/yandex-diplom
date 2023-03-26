@@ -3,17 +3,18 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"os"
+	"time"
+
 	"os/signal"
 	"syscall"
 	"yandex-diplom/config"
 	"yandex-diplom/internal/application"
 	"yandex-diplom/internal/infrastructure/server"
 	router "yandex-diplom/internal/infrastructure/server/http"
-	storage "yandex-diplom/storage/repository"
 
 	//_ "github.com/jackc/pgx/v5"
 	"github.com/pressly/goose/v3"
@@ -21,24 +22,33 @@ import (
 )
 
 func main() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Debug().Str("server", "start")
+	fmt.Println("start")
+	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).
+		Level(zerolog.TraceLevel).
+		With().
+		Timestamp().
+		Caller().
+		//Int("pid", os.Getpid()).
+		//Str("go_version", buildInfo.GoVersion).
+		Logger()
+	//zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	logger.Debug().Str("server", "start")
 
 	ctx, cencel := context.WithCancel(context.Background())
 
 	cfg, err := config.NewConfig()
 	if err != nil {
-		log.Error().Err(err)
+		logger.Error().Err(err)
 	}
 
 	err = startMigration(cfg.Server.DatabaseDSN)
 	if err != nil {
-		log.Error().Err(err)
+		logger.Error().Err(err)
 	}
 
-	service := application.NewServices(ctx, &cfg.Server, log.Log())
+	service := application.NewServices(ctx, &cfg.Server, logger.Log())
 	r := router.NewRouter(&cfg.Server, service)
-	srv := server.NewServer(&cfg.HTTP, log.Log(), r.Init())
+	srv := server.NewServer(&cfg.HTTP, logger.Log(), r.Init())
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
@@ -46,12 +56,10 @@ func main() {
 	<-quit
 
 	if err := srv.GetServer().Shutdown(ctx); err != nil {
-		log.Error().Err(err).Msg("Server forced to shutdown:")
+		logger.Error().Err(err).Msg("Server forced to shutdown:")
 	}
 
 	defer cencel()
-	//
-
 }
 
 func startMigration(dsn string) error {

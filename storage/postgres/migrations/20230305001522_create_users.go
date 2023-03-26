@@ -10,6 +10,7 @@ func init() {
 }
 
 func upCreateUsers(tx *sql.Tx) error {
+	//_, err := tx.Exec('create table test(	id serial);')
 	_, err := tx.Exec(`
 			create table users
 			(
