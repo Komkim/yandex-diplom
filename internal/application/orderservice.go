@@ -13,7 +13,7 @@ func NewOrdersService() OrdersService {
 	return OrdersService{}
 }
 
-func (o *OrdersService) SetOrderNumber(number string) error {
+func (o *OrdersService) SetOrderNumber(number int64) error {
 	return nil
 }
 func (o *OrdersService) GetOrders() ([]storage.Orders, error) {

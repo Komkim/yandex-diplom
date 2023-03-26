@@ -16,7 +16,7 @@ func upCreateOrders(tx *sql.Tx) error {
 				id        uuid not null primary key,
 				user_id   uuid REFERENCES users (id),
 				balance_id uuid REFERENCES balance (id),				
-				number	  integer not null,
+				number	  bigint not null,
 				status status not null,
 				accrual double precision,
 				withdraw double precision,
