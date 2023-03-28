@@ -1,0 +1,9 @@
+package valueobject
+
+const (
+	NEW        = "NEW"
+	REGISTERED = "REGISTERED"
+	INVALID    = "INVALID"
+	PROCESSING = "PROCESSING"
+	PROCESSED  = "PROCESSED"
+)

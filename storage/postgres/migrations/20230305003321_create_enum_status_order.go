@@ -11,7 +11,7 @@ func init() {
 
 func upCreateEnumStatusOrder(tx *sql.Tx) error {
 	_, err := tx.Exec(`
-		CREATE TYPE status AS ENUM ('REGISTERED', 'INVALID', 'PROCESSING', 'PROCESSED');
+		CREATE TYPE status AS ENUM ('NEW', 'REGISTERED', 'INVALID', 'PROCESSING', 'PROCESSED');
 	`)
 	return err
 }

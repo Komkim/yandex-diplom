@@ -12,8 +12,7 @@ type Services struct {
 	BalanceService
 	OrdersService
 	UsersService
-	DbPool *pgxpool.Pool
-	log    *zerolog.Event
+	log *zerolog.Event
 }
 
 func NewServices(ctx context.Context, cfg *config.Server, log *zerolog.Event) *Services {
@@ -23,9 +22,8 @@ func NewServices(ctx context.Context, cfg *config.Server, log *zerolog.Event) *S
 	}
 	return &Services{
 		BalanceService: NewBalanceService(),
-		OrdersService:  NewOrdersService(),
-		UsersService:   NewUsersService(),
-		DbPool:         db,
+		OrdersService:  NewOrdersService(db),
+		UsersService:   NewUsersService(db),
 		log:            log,
 	}
 }

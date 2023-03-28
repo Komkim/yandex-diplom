@@ -49,5 +49,6 @@ func defaultFlag(cfg *Config) {
 func initFlag(cfg *Config) {
 	pflag.StringVarP(&cfg.HTTP.Address, "server.address", "a", "127.0.0.1:8080", "server address")
 	pflag.StringVarP(&cfg.Server.AccrualAddress, "accrual.address", "r", "127.0.0.1:8081", "accrual address")
-	pflag.StringVarP(&cfg.Server.DatabaseDSN, "server.databaseuri", "d", "", "connect postgresql")
+	pflag.StringVarP(&cfg.Server.DatabaseDSN, "server.databasedsn", "d", "", "connect postgresql")
+	pflag.Parse()
 }

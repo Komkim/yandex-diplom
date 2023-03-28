@@ -14,9 +14,9 @@ func upCreateUsers(tx *sql.Tx) error {
 	_, err := tx.Exec(`
 			create table users
 			(
-				id        uuid not null primary key,
+				id        uuid default gen_random_uuid() not null primary key,
 				login	  varchar(40) not null,
-				hashed_password varchar(100) not null,
+				hashed_password varchar(200) not null,
 				create_at timestamp with time zone default current_timestamp
 			);
 	`)

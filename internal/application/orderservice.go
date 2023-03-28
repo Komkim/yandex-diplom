@@ -1,19 +1,24 @@
 package application
 
 import (
-	"yandex-diplom/internal/domain/entity"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"yandex-diplom/internal/domain/aggregate"
 	storage "yandex-diplom/storage/repository"
 )
 
 type OrdersService struct {
-	Orders entity.Orders
+	OrderRepo *aggregate.OrdersRepo
 }
 
-func NewOrdersService() OrdersService {
-	return OrdersService{}
+func NewOrdersService(db *pgxpool.Pool) OrdersService {
+	or := aggregate.NewOrdersRepo(db)
+	return OrdersService{OrderRepo: or}
 }
 
 func (o *OrdersService) SetOrderNumber(number int64) error {
+	//ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
+	//defer cancel()
+
 	return nil
 }
 func (o *OrdersService) GetOrders() ([]storage.Orders, error) {

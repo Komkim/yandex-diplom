@@ -3,11 +3,10 @@ package main
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	_ "github.com/lib/pq"
-	"github.com/rs/zerolog"
 	"os"
-	"time"
+	"yandex-diplom/internal/infrastructure/server/auth"
+	"yandex-diplom/pkg/logger"
 
 	"os/signal"
 	"syscall"
@@ -22,16 +21,7 @@ import (
 )
 
 func main() {
-	fmt.Println("start")
-	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).
-		Level(zerolog.TraceLevel).
-		With().
-		Timestamp().
-		Caller().
-		//Int("pid", os.Getpid()).
-		//Str("go_version", buildInfo.GoVersion).
-		Logger()
-	//zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	logger := mylogger.NewLogger()
 	logger.Debug().Str("server", "start")
 
 	ctx, cencel := context.WithCancel(context.Background())
@@ -46,9 +36,11 @@ func main() {
 		logger.Error().Err(err)
 	}
 
+	a := auth.NewMemoryAuth()
 	service := application.NewServices(ctx, &cfg.Server, logger.Log())
-	r := router.NewRouter(&cfg.Server, service)
+	r := router.NewRouter(&cfg.Server, service, a)
 	srv := server.NewServer(&cfg.HTTP, logger.Log(), r.Init())
+	go srv.Start()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
