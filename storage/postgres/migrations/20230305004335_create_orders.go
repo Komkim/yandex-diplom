@@ -13,7 +13,7 @@ func upCreateOrders(tx *sql.Tx) error {
 	_, err := tx.Exec(`
 			create table orders
 			(
-				id        uuid not null primary key,
+				id        uuid default gen_random_uuid() not null primary key,
 				user_id   uuid REFERENCES users (id),
 				balance_id uuid REFERENCES balance (id),				
 				number	  bigint not null,

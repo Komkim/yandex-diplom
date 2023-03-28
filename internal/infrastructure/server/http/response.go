@@ -36,6 +36,10 @@ func ErrInternalServer(err error) render.Renderer {
 	}
 }
 
+var UserRegistered = &Response{HTTPStatusCode: 200, StatusText: "User successfully registered and authenticated."}
+var UserAuthenticated = &Response{HTTPStatusCode: 200, StatusText: "User successfully authenticated."}
+var OrderAlreadyBeenUploaded = &Response{HTTPStatusCode: 200, StatusText: "Order number has already been uploaded by this user."}
+
 var ErrNoDataToAnswer = &Response{HTTPStatusCode: 204, StatusText: "no data to answer."}
 var ErrThereIsNoWriteOff = &Response{HTTPStatusCode: 204, StatusText: "there is no write-off."}
 

@@ -13,7 +13,7 @@ func upCreateBalance(tx *sql.Tx) error {
 	_, err := tx.Exec(`
 			create table balance
 			(
-				id        uuid not null primary key,
+				id        uuid default gen_random_uuid() not null primary key,
 				user_id   uuid REFERENCES users (id),						
 				number	  integer not null,				
 				current double precision,

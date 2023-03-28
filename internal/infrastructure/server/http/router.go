@@ -6,18 +6,21 @@ import (
 	"net/http"
 	"time"
 	"yandex-diplom/config"
+	"yandex-diplom/internal/infrastructure/server/auth"
 	storage "yandex-diplom/storage/repository"
 )
 
 type Router struct {
 	cfg     *config.Server
 	storage storage.Storage
+	auth    auth.AuthInterface
 }
 
-func NewRouter(cfg *config.Server, storage storage.Storage) *Router {
+func NewRouter(cfg *config.Server, storage storage.Storage, auth auth.AuthInterface) *Router {
 	return &Router{
 		cfg:     cfg,
 		storage: storage,
+		auth:    auth,
 	}
 }
 
@@ -38,17 +41,22 @@ func (t *Router) Init() http.Handler {
 
 	router.Route("/api/user", func(r chi.Router) {
 
-		router.Post("/register", t.UserRegister)
-		router.Post("/login", t.UserAuthentication)
+		r.Post("/register", t.UserRegister)
+		r.Post("/login", t.UserAuthentication)
 
-		router.Post("/orders", t.OrderLoading)
-		router.Get("/orders", t.OrderGetting)
+		r.Group(func(r chi.Router) {
 
-		router.Get("/balance", t.BalanceCurrent)
-		router.Post("/balance/withdraw", t.WithdrawFounds)
-		router.Get("/withdraw", t.WithdrawInformation)
+			r.Use(t.AuthMiddleware)
 
-		router.Get("/orders/{orderId}", t.PointsAccrualsInformation)
+			r.Post("/orders", t.OrderLoading)
+			r.Get("/orders", t.OrderGetting)
+
+			r.Get("/balance", t.BalanceCurrent)
+			r.Post("/balance/withdraw", t.WithdrawFounds)
+			r.Get("/withdraw", t.WithdrawInformation)
+
+			r.Get("/orders/{orderId}", t.PointsAccrualsInformation)
+		})
 	})
 
 	return router
