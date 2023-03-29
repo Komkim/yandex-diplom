@@ -8,7 +8,7 @@ import (
 )
 
 type UsersService struct {
-	UsersRepo *aggregate.UsersRepo
+	UsersRepo aggregate.UsersRepo
 }
 
 func NewUsersService(db *pgxpool.Pool) UsersService {

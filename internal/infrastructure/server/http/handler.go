@@ -77,24 +77,8 @@ func (t *Router) UserAuthentication(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
-	login, pass, ok := r.BasicAuth()
-	if ok {
-		render.Render(w, r, ErrNotAuthenticated)
-		return
-	}
-	err := t.storage.Login(login, pass)
-	if errors.Is(err, mistake.NotAuthenticated) {
-		render.Render(w, r, ErrNotAuthenticated)
-		return
-	}
-
-	if err != nil {
-		render.Render(w, r, ErrInternalServer(err))
-		return
-	}
-
 	var buf bytes.Buffer
-	_, err = buf.ReadFrom(r.Body)
+	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
 		render.Render(w, r, ErrInvalidRequestFormat(err))
 		return
@@ -106,22 +90,75 @@ func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if luna.Valid(number) {
-		render.Render(w, r, ErrInvalidOrderNumber)
+	if !luna.Valid(number) {
+		render.Render(w, r, OrderInvalidNumber)
 		return
 	}
 
-	err = t.storage.SetOrderNumber(number)
+	token, err := r.Cookie("token")
 	if err != nil {
-		render.Render(w, r, ErrInvalidRequestFormat(err))
+		render.Render(w, r, ErrInternalServer(err))
 		return
 	}
 
-	render.Render(w, r, OrderAlreadyBeenUploaded)
+	login, _ := t.auth.FetchAuth(token.Value)
+
+	err = t.storage.SetOrderNumber(number, login)
+	if errors.Is(err, mistake.OrderAlreadyUploadedThisUser) {
+		render.Render(w, r, OrderAlreadyBeenUploadedThis)
+		return
+	}
+	if errors.Is(err, mistake.OrderAlreadyUploadedAnotherUser) {
+		render.Render(w, r, OrderUploadedAnotherUser)
+		return
+	}
+
+	if err != nil {
+		render.Render(w, r, ErrInternalServer(err))
+		return
+	}
+
+	render.Render(w, r, OrderNumberAccepted)
 }
 
 func (t *Router) OrderGetting(w http.ResponseWriter, r *http.Request) {
+	token, err := r.Cookie("token")
+	if err != nil {
+		render.Render(w, r, ErrInternalServer(err))
+		return
+	}
 
+	login, _ := t.auth.FetchAuth(token.Value)
+
+	orders, err := t.storage.GetOrders(login)
+	if err != nil {
+		render.Render(w, r, ErrInternalServer(err))
+		return
+	}
+	if orders == nil {
+		render.Render(w, r, NoDataToAsnwer)
+		return
+	}
+
+	//render.Render(w, r, NewOrderResponse(&orders[0]))
+	orderResponse := make([]*OrderResponse, 0, len(orders))
+	for _, o := range orders {
+		temp := OrderResponse{
+			Number:     o.Number,
+			Status:     o.Status,
+			Accrual:    o.Accrual,
+			UploadedAt: o.UploadedAt,
+		}
+		orderResponse = append(orderResponse, &temp)
+	}
+	render.RenderList(w, r, NewOrderListResponse(orderResponse))
+
+	//if err := render.RenderList(w, r, NewOrderListResponse(orders)); err != nil {
+	//	render.Render(w, r, ErrInternalServer(err))
+	//	return
+	//}
+
+	//render.Render(w, r, SuccessfulRequestProcessing)
 }
 
 func (t *Router) BalanceCurrent(w http.ResponseWriter, r *http.Request) {

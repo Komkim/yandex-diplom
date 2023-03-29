@@ -13,15 +13,15 @@ import (
 
 const DBTIMEOUT = 5
 
-type UsersRepo struct {
+type Users struct {
 	db *pgxpool.Pool
 }
 
-func NewUsersRepo(db *pgxpool.Pool) *UsersRepo {
-	return &UsersRepo{db: db}
+func NewUsersRepo(db *pgxpool.Pool) *Users {
+	return &Users{db: db}
 }
 
-func (u *UsersRepo) GetOne(login string) (*entity.Users, error) {
+func (u *Users) GetOne(login string) (*entity.Users, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
@@ -41,7 +41,7 @@ func (u *UsersRepo) GetOne(login string) (*entity.Users, error) {
 	return &user, nil
 }
 
-func (u *UsersRepo) SetOne(login, password string) error {
+func (u *Users) SetOne(login, password string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
