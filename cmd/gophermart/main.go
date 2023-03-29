@@ -55,13 +55,6 @@ func main() {
 }
 
 func startMigration(dsn string) error {
-	//dsn := "postgres://postgres:changeme@localhost:5432/yandex?sslmode=disable"
-	//
-	//err := connectDb(dsn)
-	//if err != nil {
-	//	log.Println(err)
-	//}
-
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return err

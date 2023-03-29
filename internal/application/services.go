@@ -20,10 +20,11 @@ func NewServices(ctx context.Context, cfg *config.Server, log *zerolog.Event) *S
 	if err != nil {
 		log.Err(err)
 	}
+	us := NewUsersService(db)
 	return &Services{
 		BalanceService: NewBalanceService(),
-		OrdersService:  NewOrdersService(db),
-		UsersService:   NewUsersService(db),
+		OrdersService:  NewOrdersService(db, us.UsersRepo),
+		UsersService:   us,
 		log:            log,
 	}
 }

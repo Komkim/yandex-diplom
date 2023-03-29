@@ -3,8 +3,13 @@ package mistake
 import "errors"
 
 var (
-	InvalidOrderNumber = errors.New("Invalid order number.")
-	NotAuthenticated   = errors.New("User not authenticated.")
-	LoginIsTaken       = errors.New("Login is taken")
-	DbIdError          = errors.New("Uuid is not correct")
+	NotAuthenticated = errors.New("User not authenticated.")
+	LoginIsTaken     = errors.New("Login is taken")
+	DbIdError        = errors.New("Uuid is not correct")
+
+	UserNullError = errors.New("zero user value returned from database")
+
+	OrderInvalidNumber              = errors.New("Invalid order number.")
+	OrderAlreadyUploadedThisUser    = errors.New("Order number has already been uploaded by this user")
+	OrderAlreadyUploadedAnotherUser = errors.New("Order number has already been uploaded by another user")
 )

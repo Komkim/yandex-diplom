@@ -16,8 +16,8 @@ func upCreateBalance(tx *sql.Tx) error {
 				id        uuid default gen_random_uuid() not null primary key,
 				user_id   uuid REFERENCES users (id),						
 				number	  integer not null,				
-				current double precision,
-				withdraw double precision,
+				current   double precision,
+				withdraw  double precision,
 				upload_at timestamp with time zone default current_timestamp
 			);
 	`)

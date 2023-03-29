@@ -12,7 +12,7 @@ type OrderNumber struct {
 
 func (o *OrderNumber) Bind(r *http.Request) error {
 	if !luna.Valid(o.Number) {
-		return mistake.InvalidOrderNumber
+		return mistake.OrderInvalidNumber
 	}
 	return nil
 }
