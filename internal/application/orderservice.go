@@ -15,20 +15,16 @@ type OrdersService struct {
 }
 
 func NewOrdersService(db *pgxpool.Pool, userRepo aggregate.UsersRepo) OrdersService {
-	or := aggregate.NewOrdersRepo(db)
 	return OrdersService{
-		OrderRepo: or,
+		OrderRepo: aggregate.NewOrdersRepo(db),
 		UserRepo:  userRepo,
 	}
 }
 
 func (o *OrdersService) SetOrderNumber(number int64, login string) error {
-	user, err := o.UserRepo.GetOne(login)
+	userID, err := getUserID(o.UserRepo, login)
 	if err != nil {
 		return err
-	}
-	if user == nil {
-		return mistake.UserNullError
 	}
 
 	order, err := o.OrderRepo.GetByNumber(number)
@@ -36,43 +32,25 @@ func (o *OrdersService) SetOrderNumber(number int64, login string) error {
 		return err
 	}
 	if order != nil {
-		if order.UserId == user.Id {
+		if order.UserId == *userID {
 			return mistake.OrderAlreadyUploadedThisUser
 		}
-		if order.UserId != user.Id {
+		if order.UserId != *userID {
 			return mistake.OrderAlreadyUploadedAnotherUser
 		}
 	}
 
-	return o.OrderRepo.SetOne(number, user.Id)
+	return o.OrderRepo.SetOne(number, *userID)
 
 }
 
-//	func (o *OrdersService) GetOrderByNymber(number int64, login string) (*storage.Order, error) {
-//		user, err := o.UserRepo.GetOne(login)
-//		if err != nil {
-//			return nil, err
-//		}
-//		if user == nil {
-//			return nil, mistake.UserNullError
-//		}
-//
-//		order, err := o.OrderRepo.GetByNumber(number, user.Id)
-//		if err != nil {
-//			return nil, err
-//		}
-//		return
-//	}
 func (o *OrdersService) GetOrders(login string) ([]storage.Order, error) {
-	user, err := o.UserRepo.GetOne(login)
+	userID, err := getUserID(o.UserRepo, login)
 	if err != nil {
 		return nil, err
 	}
-	if user == nil {
-		return nil, mistake.UserNullError
-	}
 
-	entityOrders, err := o.OrderRepo.GetAllByUser(user.Id)
+	entityOrders, err := o.OrderRepo.GetAllByUser(*userID)
 	if err != nil {
 		return nil, err
 	}
@@ -84,8 +62,28 @@ func (o *OrdersService) GetOrders(login string) ([]storage.Order, error) {
 
 	return orders, nil
 }
-func (o *OrdersService) GetOrderWithdrawals() ([]storage.Order, error) {
-	return nil, nil
+func (o *OrdersService) GetOrderWithdrawals(login string) ([]storage.OrderWithdrawals, error) {
+	userID, err := getUserID(o.UserRepo, login)
+	if err != nil {
+		return nil, err
+	}
+	orders, err := o.OrderRepo.GetAllByUserWithdrawals(*userID)
+	if err != nil {
+		return nil, err
+	}
+
+	ow := make([]storage.OrderWithdrawals, 0, len(orders))
+	for _, v := range orders {
+		ow = append(
+			ow,
+			storage.OrderWithdrawals{
+				Order:       v.Number,
+				Sum:         *v.Sum,
+				ProcessedAt: v.CreateAt.Format(time.RFC3339),
+			})
+	}
+
+	return ow, nil
 }
 
 func converOrders(entityOrders []entity.Orders) ([]storage.Order, error) {
@@ -101,7 +99,7 @@ func converOrders(entityOrders []entity.Orders) ([]storage.Order, error) {
 			Number: order.Number,
 			//Status:     order.Status.String(),
 			Status:     order.Status,
-			Accrual:    order.Accrual,
+			Accrual:    order.Sum,
 			UploadedAt: c,
 		}
 		o = append(o, tempOrder)

@@ -47,7 +47,7 @@ func (o *Orders) GetAllByUser(userid uuid.UUID) ([]entity.Orders, error) {
 
 	var orders = []entity.Orders{}
 	rows, err := o.db.Query(ctx,
-		`select id, user_id, balance_id, number, status, accrual, withdraw, create_at 
+		`select id, user_id, number, status, sum, create_at 
 			 from orders where user_id = $1
     		 order by create_at desc limit 100;`,
 		userid,
@@ -65,11 +65,9 @@ func (o *Orders) GetAllByUser(userid uuid.UUID) ([]entity.Orders, error) {
 		err := rows.Scan(
 			&o.Id,
 			&o.UserId,
-			&o.BalanceId,
 			&o.Number,
 			&o.Status,
-			&o.Accrual,
-			&o.Withdraw,
+			&o.Sum,
 			&o.CreateAt,
 		)
 		if err != nil {
@@ -86,15 +84,15 @@ func (o *Orders) GetAllByUser(userid uuid.UUID) ([]entity.Orders, error) {
 	return orders, nil
 }
 
-func (o *Orders) GetAllByUserWithdrawals(userid string) ([]entity.Orders, error) {
+func (o *Orders) GetAllByUserWithdrawals(userid uuid.UUID) ([]entity.Orders, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
 	var orders = []entity.Orders{}
 	rows, err := o.db.Query(ctx,
-		`select id, user_id, balance_id, number, status, accrual, withdraw, create_at 
-			 from orders where user_id = $1 and withdraw <> null
-    		 order by create_at desc limit 100;`,
+		`select id, user_id, number, status, sum, create_at 
+			 from orders where user_id = $1 and sum < 0
+    		 order by create_at asc limit 100;`,
 		userid,
 	)
 
@@ -110,11 +108,9 @@ func (o *Orders) GetAllByUserWithdrawals(userid string) ([]entity.Orders, error)
 		err := rows.Scan(
 			&o.Id,
 			&o.UserId,
-			&o.BalanceId,
 			&o.Number,
 			&o.Status,
-			&o.Accrual,
-			&o.Withdraw,
+			&o.Sum,
 			&o.CreateAt,
 		)
 		if err != nil {
@@ -137,18 +133,16 @@ func (o *Orders) GetByNumber(number int64) (*entity.Orders, error) {
 
 	orders := entity.Orders{}
 	err := o.db.QueryRow(ctx,
-		`select id, user_id, balance_id, number, status, accrual, withdraw, create_at 
+		`select id, user_id, number, status, sum, create_at 
 			 from orders where number = $1
     		 order by create_at desc limit 1;`,
 		number,
 	).Scan(
 		&orders.Id,
 		&orders.UserId,
-		&orders.BalanceId,
 		&orders.Number,
 		&orders.Status,
-		&orders.Accrual,
-		&orders.Withdraw,
+		&orders.Sum,
 		&orders.CreateAt,
 	)
 
@@ -160,4 +154,25 @@ func (o *Orders) GetByNumber(number int64) (*entity.Orders, error) {
 	}
 
 	return &orders, nil
+}
+
+func (o *Orders) SetSum(number int64, userID uuid.UUID, sum float64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
+	defer cancel()
+
+	sqlStatement := `
+		insert into orders (user_id, number, sum, status)
+		values ($1, $2)
+		returning id`
+	var id uuid.UUID
+	err := o.db.QueryRow(ctx, sqlStatement, number, userID, sum, valueobject.PROCESSED).Scan(&id)
+	if err != nil {
+		return err
+	}
+
+	if id.ID() < 1 {
+		return mistake.DbIdError
+	}
+
+	return nil
 }
