@@ -18,6 +18,7 @@ type OrdersRepo interface {
 	GetAllByUser(userID uuid.UUID) ([]entity.Orders, error)
 	GetAllByUserWithdrawals(userid uuid.UUID) ([]entity.Orders, error)
 	GetByNumber(number int64) (*entity.Orders, error)
+	GetAccrualPoll() ([]entity.Orders, error)
 }
 
 type BalanceRepo interface {

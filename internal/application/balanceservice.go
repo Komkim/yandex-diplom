@@ -62,7 +62,7 @@ func (b *BalanceService) SetBalanceWithdraw(withdraw *storage.BalanceWithdraw, l
 	if err != nil {
 		return err
 	}
-	err = b.BalanceRepo.SetSum(*userID, withdraw.Sum)
+	err = b.BalanceRepo.SetSum(*userID, w)
 	if err != nil {
 		return err
 	}
@@ -72,4 +72,13 @@ func (b *BalanceService) SetBalanceWithdraw(withdraw *storage.BalanceWithdraw, l
 
 func (b *BalanceService) GetBalanceWithdraw(login string) (*storage.BalanceWithdrawals, error) {
 	return nil, nil
+}
+
+func (o *OrdersService) SetAccrual(orders []storage.Order) error {
+
+	//Получаем из базы по номерам все ордера что нам передали. Надо чтобы получить юзеров
+	//Сравниваем все полученные ордера с теми что прислал акруал. Если есть изменения записываем их в ордера
+	//Для ордеров со статуом завершено делаем запись для баланса
+
+	return nil
 }

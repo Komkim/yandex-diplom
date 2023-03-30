@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/rs/zerolog"
 	"net/http"
 	"time"
 	"yandex-diplom/config"
@@ -14,13 +15,15 @@ type Router struct {
 	cfg     *config.Server
 	storage storage.Storage
 	auth    auth.AuthInterface
+	log     *zerolog.Event
 }
 
-func NewRouter(cfg *config.Server, storage storage.Storage, auth auth.AuthInterface) *Router {
+func NewRouter(cfg *config.Server, storage storage.Storage, auth auth.AuthInterface, log *zerolog.Event) *Router {
 	return &Router{
 		cfg:     cfg,
 		storage: storage,
 		auth:    auth,
+		log:     log,
 	}
 }
 

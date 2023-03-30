@@ -38,7 +38,7 @@ func main() {
 
 	a := auth.NewMemoryAuth()
 	service := application.NewServices(ctx, &cfg.Server, logger.Log())
-	r := router.NewRouter(&cfg.Server, service, a)
+	r := router.NewRouter(&cfg.Server, service, a, logger.Log())
 	srv := server.NewServer(&cfg.HTTP, logger.Log(), r.Init())
 	go srv.Start()
 

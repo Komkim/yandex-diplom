@@ -55,10 +55,7 @@ func (o *OrdersService) GetOrders(login string) ([]storage.Order, error) {
 		return nil, err
 	}
 
-	orders, err := converOrders(entityOrders)
-	if err != nil {
-		return nil, err
-	}
+	orders := converOrders(entityOrders)
 
 	return orders, nil
 }
@@ -86,7 +83,7 @@ func (o *OrdersService) GetOrderWithdrawals(login string) ([]storage.OrderWithdr
 	return ow, nil
 }
 
-func converOrders(entityOrders []entity.Orders) ([]storage.Order, error) {
+func converOrders(entityOrders []entity.Orders) []storage.Order {
 	o := make([]storage.Order, 0, len(entityOrders))
 	for _, order := range entityOrders {
 		c := order.CreateAt.Format(time.RFC3339)
@@ -104,5 +101,16 @@ func converOrders(entityOrders []entity.Orders) ([]storage.Order, error) {
 		}
 		o = append(o, tempOrder)
 	}
-	return o, nil
+	return o
+}
+
+func (o *OrdersService) GetAccrualOrder() ([]storage.Order, error) {
+	entityOrders, err := o.OrderRepo.GetAccrualPoll()
+	if err != nil {
+		return nil, err
+	}
+
+	storageOrder := converOrders(entityOrders)
+
+	return storageOrder, err
 }

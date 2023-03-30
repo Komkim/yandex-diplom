@@ -91,9 +91,10 @@ func (o *Orders) GetAllByUserWithdrawals(userid uuid.UUID) ([]entity.Orders, err
 	var orders = []entity.Orders{}
 	rows, err := o.db.Query(ctx,
 		`select id, user_id, number, status, sum, create_at 
-			 from orders where user_id = $1 and sum < 0
+			 from orders where user_id = $1 and sum < 0 and status = $2
     		 order by create_at asc limit 100;`,
 		userid,
+		valueobject.PROCESSED,
 	)
 
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -161,8 +162,8 @@ func (o *Orders) SetSum(number int64, userID uuid.UUID, sum float64) error {
 	defer cancel()
 
 	sqlStatement := `
-		insert into orders (user_id, number, sum, status)
-		values ($1, $2)
+		insert into orders (number, user_id, sum, status)
+		values ($1, $2, $3, $4)
 		returning id`
 	var id uuid.UUID
 	err := o.db.QueryRow(ctx, sqlStatement, number, userID, sum, valueobject.PROCESSED).Scan(&id)
@@ -175,4 +176,49 @@ func (o *Orders) SetSum(number int64, userID uuid.UUID, sum float64) error {
 	}
 
 	return nil
+}
+
+func (o *Orders) GetAccrualPoll() ([]entity.Orders, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
+	defer cancel()
+
+	var orders = []entity.Orders{}
+	rows, err := o.db.Query(ctx,
+		`select id, user_id, number, status, sum, create_at 
+			 from orders where status = $1 or status = $2 or status = $3
+    		 order by create_at asc limit 100;`,
+		valueobject.NEW,
+		valueobject.REGISTERED,
+		valueobject.PROCESSING,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		o := entity.Orders{}
+		err := rows.Scan(
+			&o.Id,
+			&o.UserId,
+			&o.Number,
+			&o.Status,
+			&o.Sum,
+			&o.CreateAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		orders = append(orders, o)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return orders, nil
 }
