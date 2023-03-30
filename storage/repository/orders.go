@@ -5,13 +5,14 @@ type Orders interface {
 	//GetOrderByNymber(number int64, login string) (*Order, error)
 	GetOrders(login string) ([]Order, error)
 	GetOrderWithdrawals(login string) ([]OrderWithdrawals, error)
+	GetAccrualOrder() ([]Order, error)
 }
 
 type Order struct {
 	Number     int64    `json:"number"`
 	Status     string   `json:"status"`
 	Accrual    *float64 `json:"accrual,omitempty"`
-	UploadedAt string   `json:"uploaded_at"`
+	UploadedAt string   `json:"uploaded_at,omitempty"`
 }
 
 type OrderWithdrawals struct {

@@ -19,17 +19,20 @@ func (t *Router) UserRegister(w http.ResponseWriter, r *http.Request) {
 	data := &request.User{}
 	if err := render.Bind(r, data); err != nil {
 		render.Render(w, r, response.ErrInvalidRequestFormat(err))
+		t.log.Err(err)
 		return
 	}
 
 	err := t.storage.Register(data.Login, data.Password)
 	if errors.Is(err, mistake.LoginIsTaken) {
 		render.Render(w, r, response.ErrLoginIsTaken)
+		t.log.Err(err)
 		return
 	}
 
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -50,6 +53,7 @@ func (t *Router) UserAuthentication(w http.ResponseWriter, r *http.Request) {
 	data := &request.User{}
 	if err := render.Bind(r, data); err != nil {
 		render.Render(w, r, response.ErrInvalidRequestFormat(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -61,6 +65,7 @@ func (t *Router) UserAuthentication(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -88,6 +93,7 @@ func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
 	number, err := strconv.ParseInt(buf.String(), 10, 64)
 	if err != nil {
 		render.Render(w, r, response.ErrInvalidRequestFormat(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -99,6 +105,7 @@ func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
 	token, err := r.Cookie("token")
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -116,6 +123,7 @@ func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -126,6 +134,7 @@ func (t *Router) OrderGetting(w http.ResponseWriter, r *http.Request) {
 	token, err := r.Cookie("token")
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -134,6 +143,7 @@ func (t *Router) OrderGetting(w http.ResponseWriter, r *http.Request) {
 	orders, err := t.storage.GetOrders(login)
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 	if orders == nil {
@@ -166,6 +176,7 @@ func (t *Router) BalanceCurrent(w http.ResponseWriter, r *http.Request) {
 	token, err := r.Cookie("token")
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -174,6 +185,7 @@ func (t *Router) BalanceCurrent(w http.ResponseWriter, r *http.Request) {
 	balance, err := t.storage.GetBalance(login)
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -184,6 +196,7 @@ func (t *Router) WithdrawFounds(w http.ResponseWriter, r *http.Request) {
 	token, err := r.Cookie("token")
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 	login, _ := t.auth.FetchAuth(token.Value)
@@ -191,6 +204,7 @@ func (t *Router) WithdrawFounds(w http.ResponseWriter, r *http.Request) {
 	data := &request.OrderSumRequest{}
 	if err := render.Bind(r, data); err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 
@@ -204,6 +218,12 @@ func (t *Router) WithdrawFounds(w http.ResponseWriter, r *http.Request) {
 		render.Render(w, r, response.BalanceNotEnouhgFunds)
 		return
 	}
+	if err != nil {
+		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
+		return
+	}
+
 	render.Render(w, r, response.SuccessfulRequestProcessing)
 }
 
@@ -211,6 +231,7 @@ func (t *Router) WithdrawInformation(w http.ResponseWriter, r *http.Request) {
 	token, err := r.Cookie("token")
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 	login, _ := t.auth.FetchAuth(token.Value)
@@ -218,6 +239,7 @@ func (t *Router) WithdrawInformation(w http.ResponseWriter, r *http.Request) {
 	withdrawals, err := t.storage.GetOrderWithdrawals(login)
 	if err != nil {
 		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
 		return
 	}
 	if len(withdrawals) == 0 {
