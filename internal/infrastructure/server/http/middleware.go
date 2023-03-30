@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/go-chi/render"
 	"net/http"
+	"yandex-diplom/internal/infrastructure/server/http/response"
 )
 
 func (t *Router) AuthMiddleware(next http.Handler) http.Handler {
@@ -10,18 +11,18 @@ func (t *Router) AuthMiddleware(next http.Handler) http.Handler {
 
 		token, err := r.Cookie("token")
 		if err != nil {
-			render.Render(w, r, ErrInternalServer(err))
+			render.Render(w, r, response.ErrInternalServer(err))
 			return
 		}
 
 		if token == nil {
-			render.Render(w, r, ErrNotAuthenticated)
+			render.Render(w, r, response.ErrNotAuthenticated)
 			return
 		}
 
 		_, ok := t.auth.FetchAuth(token.Value)
 		if !ok {
-			render.Render(w, r, ErrNotAuthenticated)
+			render.Render(w, r, response.ErrNotAuthenticated)
 			return
 		}
 

@@ -11,8 +11,6 @@ import (
 	"yandex-diplom/internal/mistake"
 )
 
-const DBTIMEOUT = 5
-
 type Users struct {
 	db *pgxpool.Pool
 }

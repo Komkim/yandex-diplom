@@ -12,4 +12,6 @@ var (
 	OrderInvalidNumber              = errors.New("Invalid order number.")
 	OrderAlreadyUploadedThisUser    = errors.New("Order number has already been uploaded by this user")
 	OrderAlreadyUploadedAnotherUser = errors.New("Order number has already been uploaded by another user")
+
+	BalanceNotEnouhgFunds = errors.New("There are not enough funds on the account")
 )

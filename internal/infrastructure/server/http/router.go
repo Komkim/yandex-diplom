@@ -53,7 +53,7 @@ func (t *Router) Init() http.Handler {
 
 			r.Get("/balance", t.BalanceCurrent)
 			r.Post("/balance/withdraw", t.WithdrawFounds)
-			r.Get("/withdraw", t.WithdrawInformation)
+			r.Get("/withdrawals", t.WithdrawInformation)
 
 			r.Get("/orders/{orderId}", t.PointsAccrualsInformation)
 		})
