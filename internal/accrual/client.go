@@ -1,7 +1,6 @@
 package accrual
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -32,11 +31,8 @@ func (c *MyClient) GetAccrual(number int64) (*storage.Order, error) {
 		Scheme: SCHEME,
 		Host:   c.config.AccrualAddress,
 	}
-	p, err := fmt.Printf("%s/{%d}", PATH, number)
-	if err != nil {
-		return nil, err
-	}
-	u = u.JoinPath(PATH)
+	p := fmt.Sprintf("%s/{%d}", PATH, number)
+	u = u.JoinPath(p)
 
 	req, err := http.NewRequest(
 		http.MethodGet,

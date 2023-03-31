@@ -15,6 +15,7 @@ type UsersRepo interface {
 type OrdersRepo interface {
 	SetOne(number int64, userID uuid.UUID) error
 	SetSum(number int64, userID uuid.UUID, sum float64) error
+	SetOrder(number int64, userId uuid.UUID, sum float64, status string) error
 	GetAllByUser(userID uuid.UUID) ([]entity.Orders, error)
 	GetAllByUserWithdrawals(userid uuid.UUID) ([]entity.Orders, error)
 	GetByNumber(number int64) (*entity.Orders, error)
