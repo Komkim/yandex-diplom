@@ -41,6 +41,27 @@ func (o *Orders) SetOne(number int64, userId uuid.UUID) error {
 	return nil
 }
 
+func (o *Orders) SetOrder(number int64, userId uuid.UUID, sum float64, status string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
+	defer cancel()
+
+	sqlStatement := `
+		insert into orders (user_id, number, status, sum)
+		values ($1, $2, $3)
+		returning id `
+	var id uuid.UUID
+	err := o.db.QueryRow(ctx, sqlStatement, userId, number, status, sum).Scan(&id)
+	if err != nil {
+		return err
+	}
+
+	if id.ID() < 1 {
+		return mistake.DbIdError
+	}
+
+	return nil
+}
+
 func (o *Orders) GetAllByUser(userid uuid.UUID) ([]entity.Orders, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()

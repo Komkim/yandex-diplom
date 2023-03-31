@@ -3,6 +3,7 @@ package application
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"yandex-diplom/internal/domain/aggregate"
+	"yandex-diplom/internal/domain/valueobject"
 	"yandex-diplom/internal/mistake"
 	storage "yandex-diplom/storage/repository"
 )
@@ -74,7 +75,30 @@ func (b *BalanceService) GetBalanceWithdraw(login string) (*storage.BalanceWithd
 	return nil, nil
 }
 
-func (o *OrdersService) SetAccrual(orders []storage.Order) error {
+func (b *BalanceService) SetAccrual(accrualOrders []storage.Order, dbOrder map[int64]storage.Order) error {
+f:
+	for _, or := range accrualOrders {
+		if or.Status == dbOrder[or.Number].Status {
+			continue f
+		}
+
+		entityOrder, err := b.OrderRepo.GetByNumber(or.Number)
+		if err != nil {
+			return err
+		}
+
+		err = b.OrderRepo.SetOrder(or.Number, entityOrder.UserId, *or.Accrual, or.Status)
+		if err != nil {
+			return err
+		}
+
+		if or.Status == valueobject.PROCESSED {
+			err = b.BalanceRepo.SetSum(entityOrder.UserId, *or.Accrual)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	//Получаем из базы по номерам все ордера что нам передали. Надо чтобы получить юзеров
 	//Сравниваем все полученные ордера с теми что прислал акруал. Если есть изменения записываем их в ордера
