@@ -54,7 +54,7 @@ func (u *Users) SetOne(login, password string) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.ErrDbId
+		return mistake.ErrDBID
 	}
 
 	return nil
