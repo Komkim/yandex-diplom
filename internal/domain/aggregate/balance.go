@@ -103,7 +103,7 @@ func (b *Balance) SetSum(userID uuid.UUID, sum float64) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.ErrDbId
+		return mistake.ErrDBID
 	}
 
 	return nil

@@ -5,7 +5,7 @@ import "errors"
 var (
 	ErrNotAuthenticated = errors.New("user not authenticated")
 	ErrLoginIsTaken     = errors.New("login is taken")
-	ErrDbId             = errors.New("uuid is not correct")
+	ErrDBID             = errors.New("uuid is not correct")
 
 	ErrUserNullError = errors.New("zero user value returned from database")
 

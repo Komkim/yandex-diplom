@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	defaultAccrualDatabaseUri  = "postgres://postgres:changeme@localhost:5432/accrual?sslmode=disable"
+	defaultAccrualDatabaseURI  = "postgres://postgres:changeme@localhost:5432/accrual?sslmode=disable"
 	defaultAccrualAddressStart = "127.0.0.1:8081"
 )
 
@@ -32,7 +32,7 @@ func NewAccrualConfig() (*AccrualConfig, error) {
 
 func defaultAccrualFlag(cfg *AccrualConfig) {
 	cfg.Address = defaultAccrualAddressStart
-	cfg.DatabaseDSN = defaultAccrualDatabaseUri
+	cfg.DatabaseDSN = defaultAccrualDatabaseURI
 }
 
 func initAccrualFlag(cfg *AccrualConfig) {

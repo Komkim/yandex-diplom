@@ -38,7 +38,7 @@ func (c *Connect) SetConnect(number int64, goodsID uuid.UUID) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.ErrDbId
+		return mistake.ErrDBID
 	}
 
 	return nil

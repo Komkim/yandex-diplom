@@ -35,7 +35,7 @@ func (o *Orders) SetOne(number int64, userID uuid.UUID) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.ErrDbId
+		return mistake.ErrDBID
 	}
 
 	return nil
@@ -56,7 +56,7 @@ func (o *Orders) SetOrder(number int64, userID uuid.UUID, sum float64, status st
 	}
 
 	if id.ID() < 1 {
-		return mistake.ErrDbId
+		return mistake.ErrDBID
 	}
 
 	return nil
@@ -193,7 +193,7 @@ func (o *Orders) SetSum(number int64, userID uuid.UUID, sum float64) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.ErrDbId
+		return mistake.ErrDBID
 	}
 
 	return nil

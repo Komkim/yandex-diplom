@@ -41,7 +41,7 @@ func (o *Orders) SetOrders(number int64, status string, reward float64) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.ErrDbId
+		return mistake.ErrDBID
 	}
 
 	return nil
