@@ -48,7 +48,7 @@ func (g *Goods) SetGoods(description string, price float64) (*uuid.UUID, error) 
 	}
 
 	if id.ID() < 1 {
-		return nil, mistake.DbIdError
+		return nil, mistake.ErrDbId
 	}
 
 	return &id, nil
@@ -69,7 +69,7 @@ func (g *Goods) SetReward(name, rewardType string, reward int64) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.DbIdError
+		return mistake.ErrDbId
 	}
 
 	return nil

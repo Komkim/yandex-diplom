@@ -28,7 +28,7 @@ func (u *UsersService) Register(login, pass string) error {
 	}
 
 	if user != nil {
-		return mistake.LoginIsTaken
+		return mistake.ErrLoginIsTaken
 	}
 
 	err = u.UsersRepo.SetOne(login, hashPassword)
@@ -44,7 +44,7 @@ func (u *UsersService) Login(login, pass string) error {
 		return err
 	}
 	if user == nil {
-		return mistake.NotAuthenticated
+		return mistake.ErrNotAuthenticated
 	}
 
 	ok, err := password.Verify(user.HashedPassword, pass)
@@ -52,7 +52,7 @@ func (u *UsersService) Login(login, pass string) error {
 		return err
 	}
 	if !ok {
-		return mistake.NotAuthenticated
+		return mistake.ErrNotAuthenticated
 	}
 
 	return nil

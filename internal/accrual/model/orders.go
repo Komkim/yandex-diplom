@@ -11,7 +11,7 @@ import (
 )
 
 type ModelOrders struct {
-	Id       uuid.UUID `db:"id"`
+	ID       uuid.UUID `db:"id"`
 	Number   int64     `db:"number"`
 	Status   string    `db:"status"`
 	Reward   float64   `db:"reward"`
@@ -41,7 +41,7 @@ func (o *Orders) SetOrders(number int64, status string, reward float64) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.DbIdError
+		return mistake.ErrDbId
 	}
 
 	return nil
@@ -59,7 +59,7 @@ func (o *Orders) GetOrdersByNumber(number int64) (*ModelOrders, error) {
     		 order by create_at desc limit 1;`,
 		number,
 	).Scan(
-		&orders.Id,
+		&orders.ID,
 		&orders.Number,
 		&orders.Status,
 		&orders.Reward,

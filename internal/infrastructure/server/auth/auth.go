@@ -3,6 +3,7 @@ package auth
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -24,7 +25,7 @@ func (m *MemoryAuth) CreateAuth(login, pass string) string {
 	defer m.mutex.RUnlock()
 
 	time64 := time.Now().Unix()
-	timeInt := string(time64)
+	timeInt := strconv.FormatInt(time64, 10)
 	token := login + pass + timeInt
 	hashToken := sha256.Sum256([]byte(token))
 	hashedToken := hex.EncodeToString(hashToken[:])
