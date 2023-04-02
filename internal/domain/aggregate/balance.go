@@ -20,7 +20,7 @@ func NewBalanceRepo(db *pgxpool.Pool) *Balance {
 	return &Balance{db: db}
 }
 
-func (b *Balance) GetByUser(userId uuid.UUID) (*entity.Balance, error) {
+func (b *Balance) GetByUser(userID uuid.UUID) (*entity.Balance, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
@@ -35,8 +35,8 @@ func (b *Balance) GetByUser(userId uuid.UUID) (*entity.Balance, error) {
 					 unic_balance
 				where upload_at in (select upload_at from balance where upload_at = unic_balance.u order by upload_at desc limit 1)
 					and name=$1;`,
-		userId,
-	).Scan(&balance.Id, &balance.UserID, &balance.Sum, &balance.CreateAt)
+		userID,
+	).Scan(&balance.ID, &balance.UserID, &balance.Sum, &balance.CreateAt)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
@@ -68,14 +68,14 @@ func (b *Balance) GetCurrentByUser(userID uuid.UUID) (*float64, error) {
 	return &current.Float64, nil
 }
 
-func (b *Balance) GetWithdrawntByUser(userId uuid.UUID) (*float64, error) {
+func (b *Balance) GetWithdrawntByUser(userID uuid.UUID) (*float64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
 	var withdrawn sql.NullFloat64
 	err := b.db.QueryRow(ctx,
 		`select sum(sum) from balance where user_id = $1 and sum < 0 group by user_id;`,
-		userId,
+		userID,
 	).Scan(withdrawn)
 
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -88,7 +88,7 @@ func (b *Balance) GetWithdrawntByUser(userId uuid.UUID) (*float64, error) {
 	return &withdrawn.Float64, nil
 }
 
-func (o *Balance) SetSum(userID uuid.UUID, sum float64) error {
+func (b *Balance) SetSum(userID uuid.UUID, sum float64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
@@ -97,13 +97,13 @@ func (o *Balance) SetSum(userID uuid.UUID, sum float64) error {
 		values ($1, $2)
 		returning id`
 	var id uuid.UUID
-	err := o.db.QueryRow(ctx, sqlStatement, userID, sum).Scan(&id)
+	err := b.db.QueryRow(ctx, sqlStatement, userID, sum).Scan(&id)
 	if err != nil {
 		return err
 	}
 
 	if id.ID() < 1 {
-		return mistake.DbIdError
+		return mistake.ErrDbId
 	}
 
 	return nil

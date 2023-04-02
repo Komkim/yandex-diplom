@@ -55,7 +55,7 @@ func (b *BalanceService) SetBalanceWithdraw(withdraw *storage.BalanceWithdraw, l
 		return err
 	}
 	if current != nil && *current < withdraw.Sum {
-		return mistake.BalanceNotEnouhgFunds
+		return mistake.ErrBalanceNotEnouhgFunds
 	}
 
 	w := -withdraw.Sum
@@ -87,13 +87,13 @@ f:
 			return err
 		}
 
-		err = b.OrderRepo.SetOrder(or.Number, entityOrder.UserId, *or.Accrual, or.Status)
+		err = b.OrderRepo.SetOrder(or.Number, entityOrder.UserID, *or.Accrual, or.Status)
 		if err != nil {
 			return err
 		}
 
 		if or.Status == valueobject.PROCESSED {
-			err = b.BalanceRepo.SetSum(entityOrder.UserId, *or.Accrual)
+			err = b.BalanceRepo.SetSum(entityOrder.UserID, *or.Accrual)
 			if err != nil {
 				return err
 			}

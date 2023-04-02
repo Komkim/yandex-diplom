@@ -20,7 +20,7 @@ type Services struct {
 }
 
 func NewServices(ctx context.Context, cfg *config.Server, log *zerolog.Event) *Services {
-	db, err := newDb(ctx, cfg.DatabaseDSN)
+	db, err := newDB(ctx, cfg.DatabaseDSN)
 	if err != nil {
 		log.Err(err)
 	}
@@ -34,7 +34,7 @@ func NewServices(ctx context.Context, cfg *config.Server, log *zerolog.Event) *S
 	}
 }
 
-func newDb(ctx context.Context, connString string) (*pgxpool.Pool, error) {
+func newDB(ctx context.Context, connString string) (*pgxpool.Pool, error) {
 	pool, err := pgxpool.New(ctx, connString)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func getUserID(UserRepo aggregate.UsersRepo, login string) (*uuid.UUID, error) {
 		return nil, err
 	}
 	if user == nil {
-		return nil, mistake.UserNullError
+		return nil, mistake.ErrUserNullError
 	}
-	return &user.Id, nil
+	return &user.ID, nil
 }

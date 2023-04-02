@@ -6,7 +6,7 @@ import (
 )
 
 type Balance struct {
-	Id       uuid.UUID `db:"id"`
+	ID       uuid.UUID `db:"id"`
 	UserID   uuid.UUID `db:"user_id"`
 	Sum      float64   `db:"sum"`
 	CreateAt time.Time `db:"create_at"`

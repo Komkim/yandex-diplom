@@ -7,7 +7,7 @@ import (
 
 const (
 	defaultServerAddress  = "127.0.0.1:8080"
-	defaultDatabaseUri    = "postgres://postgres:changeme@localhost:5432/yandex?sslmode=disable"
+	defaultDatabaseDsn    = "postgres://postgres:changeme@localhost:5432/yandex?sslmode=disable"
 	defaultAccrualAddress = "127.0.0.1:8081"
 )
 
@@ -42,7 +42,7 @@ func NewConfig() (*Config, error) {
 func defaultFlag(cfg *Config) {
 	cfg.HTTP.Address = defaultServerAddress
 
-	cfg.Server.DatabaseDSN = defaultDatabaseUri
+	cfg.Server.DatabaseDSN = defaultDatabaseDsn
 	cfg.Server.AccrualAddress = defaultAccrualAddress
 }
 

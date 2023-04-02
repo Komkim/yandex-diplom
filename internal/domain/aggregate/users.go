@@ -27,7 +27,7 @@ func (u *Users) GetOne(login string) (*entity.Users, error) {
 	err := u.db.QueryRow(ctx,
 		`select id, login, hashed_password, create_at from users where login = $1;`,
 		login,
-	).Scan(&user.Id, &user.Login, &user.HashedPassword, &user.CreateAt)
+	).Scan(&user.ID, &user.Login, &user.HashedPassword, &user.CreateAt)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
@@ -54,7 +54,7 @@ func (u *Users) SetOne(login, password string) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.DbIdError
+		return mistake.ErrDbId
 	}
 
 	return nil

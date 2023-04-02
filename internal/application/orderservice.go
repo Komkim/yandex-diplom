@@ -32,11 +32,11 @@ func (o *OrdersService) SetOrderNumber(number int64, login string) error {
 		return err
 	}
 	if order != nil {
-		if order.UserId == *userID {
-			return mistake.OrderAlreadyUploadedThisUser
+		if order.UserID == *userID {
+			return mistake.ErrOrderAlreadyUploadedThisUser
 		}
-		if order.UserId != *userID {
-			return mistake.OrderAlreadyUploadedAnotherUser
+		if order.UserID != *userID {
+			return mistake.ErrOrderAlreadyUploadedAnotherUser
 		}
 	}
 

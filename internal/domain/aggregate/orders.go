@@ -20,7 +20,7 @@ func NewOrdersRepo(db *pgxpool.Pool) *Orders {
 	return &Orders{db: db}
 }
 
-func (o *Orders) SetOne(number int64, userId uuid.UUID) error {
+func (o *Orders) SetOne(number int64, userID uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
@@ -29,19 +29,19 @@ func (o *Orders) SetOne(number int64, userId uuid.UUID) error {
 		values ($1, $2, $3)
 		returning id `
 	var id uuid.UUID
-	err := o.db.QueryRow(ctx, sqlStatement, userId, number, valueobject.NEW).Scan(&id)
+	err := o.db.QueryRow(ctx, sqlStatement, userID, number, valueobject.NEW).Scan(&id)
 	if err != nil {
 		return err
 	}
 
 	if id.ID() < 1 {
-		return mistake.DbIdError
+		return mistake.ErrDbId
 	}
 
 	return nil
 }
 
-func (o *Orders) SetOrder(number int64, userId uuid.UUID, sum float64, status string) error {
+func (o *Orders) SetOrder(number int64, userID uuid.UUID, sum float64, status string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
@@ -50,19 +50,19 @@ func (o *Orders) SetOrder(number int64, userId uuid.UUID, sum float64, status st
 		values ($1, $2, $3)
 		returning id `
 	var id uuid.UUID
-	err := o.db.QueryRow(ctx, sqlStatement, userId, number, status, sum).Scan(&id)
+	err := o.db.QueryRow(ctx, sqlStatement, userID, number, status, sum).Scan(&id)
 	if err != nil {
 		return err
 	}
 
 	if id.ID() < 1 {
-		return mistake.DbIdError
+		return mistake.ErrDbId
 	}
 
 	return nil
 }
 
-func (o *Orders) GetAllByUser(userid uuid.UUID) ([]entity.Orders, error) {
+func (o *Orders) GetAllByUser(userID uuid.UUID) ([]entity.Orders, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
@@ -71,7 +71,7 @@ func (o *Orders) GetAllByUser(userid uuid.UUID) ([]entity.Orders, error) {
 		`select id, user_id, number, status, sum, create_at 
 			 from orders where user_id = $1
     		 order by create_at desc limit 100;`,
-		userid,
+		userID,
 	)
 
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -84,8 +84,8 @@ func (o *Orders) GetAllByUser(userid uuid.UUID) ([]entity.Orders, error) {
 	for rows.Next() {
 		o := entity.Orders{}
 		err := rows.Scan(
-			&o.Id,
-			&o.UserId,
+			&o.ID,
+			&o.UserID,
 			&o.Number,
 			&o.Status,
 			&o.Sum,
@@ -105,7 +105,7 @@ func (o *Orders) GetAllByUser(userid uuid.UUID) ([]entity.Orders, error) {
 	return orders, nil
 }
 
-func (o *Orders) GetAllByUserWithdrawals(userid uuid.UUID) ([]entity.Orders, error) {
+func (o *Orders) GetAllByUserWithdrawals(userID uuid.UUID) ([]entity.Orders, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
@@ -114,7 +114,7 @@ func (o *Orders) GetAllByUserWithdrawals(userid uuid.UUID) ([]entity.Orders, err
 		`select id, user_id, number, status, sum, create_at 
 			 from orders where user_id = $1 and sum < 0 and status = $2
     		 order by create_at asc limit 100;`,
-		userid,
+		userID,
 		valueobject.PROCESSED,
 	)
 
@@ -128,8 +128,8 @@ func (o *Orders) GetAllByUserWithdrawals(userid uuid.UUID) ([]entity.Orders, err
 	for rows.Next() {
 		o := entity.Orders{}
 		err := rows.Scan(
-			&o.Id,
-			&o.UserId,
+			&o.ID,
+			&o.UserID,
 			&o.Number,
 			&o.Status,
 			&o.Sum,
@@ -160,8 +160,8 @@ func (o *Orders) GetByNumber(number int64) (*entity.Orders, error) {
     		 order by create_at desc limit 1;`,
 		number,
 	).Scan(
-		&orders.Id,
-		&orders.UserId,
+		&orders.ID,
+		&orders.UserID,
 		&orders.Number,
 		&orders.Status,
 		&orders.Sum,
@@ -193,7 +193,7 @@ func (o *Orders) SetSum(number int64, userID uuid.UUID, sum float64) error {
 	}
 
 	if id.ID() < 1 {
-		return mistake.DbIdError
+		return mistake.ErrDbId
 	}
 
 	return nil
@@ -223,8 +223,8 @@ func (o *Orders) GetAccrualPoll() ([]entity.Orders, error) {
 	for rows.Next() {
 		o := entity.Orders{}
 		err := rows.Scan(
-			&o.Id,
-			&o.UserId,
+			&o.ID,
+			&o.UserID,
 			&o.Number,
 			&o.Status,
 			&o.Sum,

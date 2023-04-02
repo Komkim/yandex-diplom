@@ -32,7 +32,7 @@ func main() {
 		logger.Error().Err(err)
 	}
 
-	db, err := newDb(ctx, cfg.DatabaseDSN)
+	db, err := newDB(ctx, cfg.DatabaseDSN)
 	if err != nil {
 		logger.Error().Err(err)
 		return
@@ -56,7 +56,7 @@ func main() {
 	defer cencel()
 }
 
-func newDb(ctx context.Context, connString string) (*pgxpool.Pool, error) {
+func newDB(ctx context.Context, connString string) (*pgxpool.Pool, error) {
 	pool, err := pgxpool.New(ctx, connString)
 	if err != nil {
 		return nil, err

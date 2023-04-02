@@ -24,7 +24,7 @@ func (t *Router) UserRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := t.storage.Register(data.Login, data.Password)
-	if errors.Is(err, mistake.LoginIsTaken) {
+	if errors.Is(err, mistake.ErrLoginIsTaken) {
 		render.Render(w, r, response.ErrLoginIsTaken)
 		t.log.Err(err)
 		return
@@ -58,7 +58,7 @@ func (t *Router) UserAuthentication(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := t.storage.Login(data.Login, data.Password)
-	if errors.Is(err, mistake.NotAuthenticated) {
+	if errors.Is(err, mistake.ErrNotAuthenticated) {
 		render.Render(w, r, response.ErrNotAuthenticated)
 		return
 	}
@@ -112,11 +112,11 @@ func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
 	login, _ := t.auth.FetchAuth(token.Value)
 
 	err = t.storage.SetOrderNumber(number, login)
-	if errors.Is(err, mistake.OrderAlreadyUploadedThisUser) {
+	if errors.Is(err, mistake.ErrOrderAlreadyUploadedThisUser) {
 		render.Render(w, r, response.OrderAlreadyBeenUploadedThis)
 		return
 	}
-	if errors.Is(err, mistake.OrderAlreadyUploadedAnotherUser) {
+	if errors.Is(err, mistake.ErrOrderAlreadyUploadedAnotherUser) {
 		render.Render(w, r, response.OrderUploadedAnotherUser)
 		return
 	}
@@ -214,7 +214,7 @@ func (t *Router) WithdrawFounds(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = t.storage.SetBalanceWithdraw(&data.BalanceWithdraw, login)
-	if err == mistake.BalanceNotEnouhgFunds {
+	if err == mistake.ErrBalanceNotEnouhgFunds {
 		render.Render(w, r, response.BalanceNotEnouhgFunds)
 		return
 	}
