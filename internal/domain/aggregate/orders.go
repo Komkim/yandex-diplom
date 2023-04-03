@@ -47,7 +47,7 @@ func (o *Orders) SetOrder(number int64, userID uuid.UUID, sum float64, status st
 
 	sqlStatement := `
 		insert into orders (user_id, number, status, sum)
-		values ($1, $2, $3)
+		values ($1, $2, $3, $4)
 		returning id `
 	var id uuid.UUID
 	err := o.db.QueryRow(ctx, sqlStatement, userID, number, status, sum).Scan(&id)
@@ -69,7 +69,7 @@ func (o *Orders) GetAllByUser(userID uuid.UUID) ([]entity.Orders, error) {
 	var orders = []entity.Orders{}
 	rows, err := o.db.Query(ctx,
 		`select id, user_id, number, status, sum, create_at 
-			 from orders where user_id = $1
+			 from orders where user_id = $1 
     		 order by create_at desc limit 100;`,
 		userID,
 	)
@@ -110,12 +110,30 @@ func (o *Orders) GetAllByUserWithdrawals(userID uuid.UUID) ([]entity.Orders, err
 	defer cancel()
 
 	var orders = []entity.Orders{}
+	//rows, err := o.db.Query(ctx,
+	//	`
+	//		select id, user_id, number, status, sum, create_at
+	//		 from orders where user_id = $1 and sum < 0 and status = $2
+	//		 order by create_at asc limit 100;
+	//	`,
+	//	userID,
+	//	valueobject.PROCESSED,
+	//)
 	rows, err := o.db.Query(ctx,
-		`select id, user_id, number, status, sum, create_at 
-			 from orders where user_id = $1 and sum < 0 and status = $2
-    		 order by create_at asc limit 100;`,
+		`
+			with last as (
+				select max(create_at) as m, number
+				from orders
+				where user_id = $1
+				group by number
+			)
+			select o.id, o.user_id, o.number, o.status, o.sum, o.create_at
+			from orders as o,
+				 last
+			where o.create_at in (last.m)
+			  and o.user_id  = $1;
+		`,
 		userID,
-		valueobject.PROCESSED,
 	)
 
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -203,14 +221,34 @@ func (o *Orders) GetAccrualPoll() ([]entity.Orders, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
+	//var orders = []entity.Orders{}
+	//rows, err := o.db.Query(ctx,
+	//	`select id, user_id, number, status, sum, create_at
+	//		 from orders where status = $1
+	//		 order by create_at asc limit 100;`,
+	//	valueobject.NEW,
+	//	//valueobject.REGISTERED,
+	//	//valueobject.PROCESSING,
+	//)
+
 	var orders = []entity.Orders{}
 	rows, err := o.db.Query(ctx,
-		`select id, user_id, number, status, sum, create_at 
-			 from orders where status = $1 or status = $2 or status = $3
-    		 order by create_at asc limit 100;`,
-		valueobject.NEW,
-		valueobject.REGISTERED,
-		valueobject.PROCESSING,
+		`
+			with last as (
+				select max(create_at) as m, user_id
+				from orders
+				group by user_id
+			)
+			select o.id, o.user_id, o.number, o.status, o.sum, o.create_at
+			from orders as o,
+				 last
+			where o.create_at in (last.m)
+			  and (o.status <> $1 and o.status <> $2)
+			  and o.user_id in (last.user_id)
+`,
+		valueobject.PROCESSED,
+		valueobject.INVALID,
+		//valueobject.PROCESSING,
 	)
 
 	if errors.Is(err, pgx.ErrNoRows) {

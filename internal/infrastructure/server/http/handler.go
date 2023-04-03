@@ -214,7 +214,7 @@ func (t *Router) WithdrawFounds(w http.ResponseWriter, r *http.Request) {
 
 	err = t.storage.SetBalanceWithdraw(&data.BalanceWithdraw, login)
 	if err == mistake.ErrBalanceNotEnouhgFunds {
-		render.Render(w, r, response.BalanceNotEnouhgFunds)
+		render.Render(w, r, response.ErrNotEnoughFunds)
 		return
 	}
 	if err != nil {

@@ -26,7 +26,7 @@ func NewClient(config *config.Server) *MyClient {
 	}
 }
 
-func (c *MyClient) GetAccrual(number int64) (*storage.Order, error) {
+func (c *MyClient) GetAccrual(number int64) (*storage.OrderAccrual, error) {
 	u := &url.URL{
 		Scheme: SCHEME,
 		Host:   c.config.AccrualAddress,
@@ -50,7 +50,7 @@ func (c *MyClient) GetAccrual(number int64) (*storage.Order, error) {
 		return nil, err
 	}
 
-	var order storage.Order
+	var order storage.OrderAccrual
 	if err = json.NewDecoder(resp.Body).Decode(&order); err != nil {
 		return nil, err
 	}

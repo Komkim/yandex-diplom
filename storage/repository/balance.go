@@ -4,7 +4,7 @@ type Balance interface {
 	GetBalance(login string) (*BalanceCurrent, error)
 	SetBalanceWithdraw(withdraw *BalanceWithdraw, login string) error
 	GetBalanceWithdraw(login string) (*BalanceWithdrawals, error)
-	SetAccrual(accrualOrders []Order, dbOrder map[int64]Order) error
+	SetAccrual(accrualOrders []OrderAccrual) error
 }
 
 type BalanceCurrent struct {

@@ -65,8 +65,7 @@ func (a *Accrual) sendAccrual(ctx context.Context, orderChan chan []storage.Orde
 	for {
 		select {
 		case orders := <-orderChan:
-			resultOrders := make([]storage.Order, 0, len(orders))
-			orderMap := make(map[int64]storage.Order)
+			resultOrders := make([]storage.OrderAccrual, 0, len(orders))
 		n:
 			for _, o := range orders {
 				n, err := strconv.ParseInt(o.Number, 10, 64)
@@ -83,12 +82,11 @@ func (a *Accrual) sendAccrual(ctx context.Context, orderChan chan []storage.Orde
 					continue n
 				}
 				resultOrders = append(resultOrders, *order)
-				orderMap[n] = *order
 			}
 			//dbChan <- resultOrders
 
 			go func() {
-				err := a.storage.SetAccrual(resultOrders, orderMap)
+				err := a.storage.SetAccrual(resultOrders)
 				a.log.Err(err)
 			}()
 
