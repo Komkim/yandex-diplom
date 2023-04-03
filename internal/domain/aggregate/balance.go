@@ -55,7 +55,7 @@ func (b *Balance) GetCurrentByUser(userID uuid.UUID) (*float64, error) {
 
 	var current sql.NullFloat64
 	err := b.db.QueryRow(ctx,
-		`select sum(sum) as s from balance where user_id = $1 group by user_id;`,
+		`select sum(sum)::double precision as sum from balance where user_id = $1 group by user_id;`,
 		userID,
 	).Scan(current)
 
@@ -78,7 +78,7 @@ func (b *Balance) GetWithdrawntByUser(userID uuid.UUID) (*float64, error) {
 
 	var withdrawn sql.NullFloat64
 	err := b.db.QueryRow(ctx,
-		`select sum(sum) from balance where user_id = $1 and sum < 0 group by user_id;`,
+		`select sum(sum)::double precision as sum from balance where user_id = $1 and sum < 0 group by user_id;`,
 		userID,
 	).Scan(withdrawn)
 
