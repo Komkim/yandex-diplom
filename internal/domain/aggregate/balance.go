@@ -3,7 +3,6 @@ package aggregate
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -74,8 +73,6 @@ func (b *Balance) GetCurrentByUser(userID uuid.UUID) (*float64, error) {
     		 order by create_at asc ;`,
 		userID,
 	)
-
-	fmt.Printf(userID.String())
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
