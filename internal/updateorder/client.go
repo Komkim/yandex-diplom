@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	SCHEME = "http"
+	SCHEME = "http://"
 	PATH   = "api/orders/"
 )
 
