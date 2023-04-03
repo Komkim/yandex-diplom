@@ -43,8 +43,6 @@ func (c *MyClient) GetAccrual(number int64) (*storage.OrderAccrual, error) {
 		return nil, err
 	}
 
-	//req.Header.Add("Content-Type", "application/json")
-
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
