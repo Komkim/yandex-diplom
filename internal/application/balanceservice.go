@@ -39,9 +39,11 @@ func (b *BalanceService) GetBalance(login string) (*storage.BalanceCurrent, erro
 		return nil, err
 	}
 
+	w := *withdraw
+	ww := -w
 	return &storage.BalanceCurrent{
 		Current:   current,
-		Withdrawn: withdraw,
+		Withdrawn: &ww,
 	}, nil
 }
 

@@ -86,7 +86,8 @@ func (o *Orders) GetAllByUser(userID uuid.UUID) ([]entity.Orders, error) {
 			from orders as o,
 				 last
 			where o.create_at in (last.m)
-			  and o.user_id  = $1;
+			  and o.user_id  = $1
+			order by o.create_at asc;
 `,
 		userID,
 	)
@@ -148,7 +149,8 @@ func (o *Orders) GetAllByUserWithdrawals(userID uuid.UUID) ([]entity.Orders, err
 			from orders as o,
 				 last
 			where o.create_at in (last.m)
-			  and o.user_id  = $1 and sum < 0;
+			  and o.user_id  = $1 and sum < 0
+			order by o.create_at asc;
 		`,
 		userID,
 	)

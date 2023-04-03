@@ -51,26 +51,13 @@ func (b *Balance) GetCurrentByUser(userID uuid.UUID) (*float64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DBTIMEOUT*time.Second)
 	defer cancel()
 
-	//var current sql.NullFloat64
-	//err := b.db.QueryRow(ctx,
-	//	`select sum(sum)::double precision as sum from balance where user_id = $1 group by user_id;`,
-	//	userID,
-	//).Scan(current)
-	//
-	//if errors.Is(err, pgx.ErrNoRows) {
-	//	return nil, nil
-	//}
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//return &current.Float64, nil
-
-	var withdrawns float64
+	var current float64
 	rows, err := b.db.Query(ctx,
-		`select id, user_id, sum, create_at 
+		`
+			 select id, user_id, sum, create_at 
 			 from balance where user_id = $1
-    		 order by create_at asc ;`,
+    		 order by create_at asc ;
+`,
 		userID,
 	)
 
@@ -92,7 +79,7 @@ func (b *Balance) GetCurrentByUser(userID uuid.UUID) (*float64, error) {
 		if err != nil {
 			return nil, err
 		}
-		withdrawns += w.Sum
+		current += w.Sum
 	}
 
 	err = rows.Err()
@@ -100,7 +87,7 @@ func (b *Balance) GetCurrentByUser(userID uuid.UUID) (*float64, error) {
 		return nil, err
 	}
 
-	return &withdrawns, nil
+	return &current, nil
 }
 
 func (b *Balance) GetWithdrawntByUser(userID uuid.UUID) (*float64, error) {
