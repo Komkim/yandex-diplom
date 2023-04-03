@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
+	"strconv"
 	"time"
 	"yandex-diplom/internal/domain/aggregate"
 	"yandex-diplom/internal/domain/entity"
@@ -74,7 +75,7 @@ func (o *OrdersService) GetOrderWithdrawals(login string) ([]storage.OrderWithdr
 		ow = append(
 			ow,
 			storage.OrderWithdrawals{
-				Order:       v.Number,
+				Order:       strconv.FormatInt(v.Number, 10),
 				Sum:         *v.Sum,
 				ProcessedAt: v.CreateAt.Format(time.RFC3339),
 			})
@@ -87,14 +88,8 @@ func converOrders(entityOrders []entity.Orders) []storage.Order {
 	o := make([]storage.Order, 0, len(entityOrders))
 	for _, order := range entityOrders {
 		c := order.CreateAt.Format(time.RFC3339)
-		//createAt, err := time.Parse(time.RFC3339, c)
-		//createAt, err := time.Parse(time.RFC3339, order.CreateAt.String())
-		//if err != nil {
-		//	return nil, err
-		//}
 		tempOrder := storage.Order{
-			Number: order.Number,
-			//Status:     order.Status.String(),
+			Number:     strconv.FormatInt(order.Number, 10),
 			Status:     order.Status,
 			Accrual:    order.Sum,
 			UploadedAt: c,

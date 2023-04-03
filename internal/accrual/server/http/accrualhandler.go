@@ -37,13 +37,19 @@ func (t *AccrualRouter) OrdersLoading(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !luna.Valid(data.Order) {
+	n, err := strconv.ParseInt(data.Order, 10, 64)
+	if err != nil {
+		render.Render(w, r, accrualresponse.ErrInvalidRequestFormat(err))
+		t.log.Err(err)
+		return
+	}
+	if !luna.Valid(n) {
 		render.Render(w, r, accrualresponse.ErrInvalidRequestFormat(errors.New("luna not valid")))
 		t.log.Err(errors.New("luna not valid"))
 		return
 	}
 
-	err := t.storage.SetAccrualOrders(&data.AccrualOrdersSet)
+	err = t.storage.SetAccrualOrders(&data.AccrualOrdersSet)
 	if err != nil {
 		render.Render(w, r, accrualresponse.ErrInternalServer(err))
 		t.log.Err(err)
@@ -68,6 +74,11 @@ func (t *AccrualRouter) OrdersInformation(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		render.Render(w, r, accrualresponse.ErrInternalServer(err))
 		t.log.Err(err)
+		return
+	}
+
+	if order == nil {
+		render.Render(w, r, accrualresponse.OrderNotRegistered)
 		return
 	}
 

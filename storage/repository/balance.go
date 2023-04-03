@@ -13,12 +13,12 @@ type BalanceCurrent struct {
 }
 
 type BalanceWithdraw struct {
-	Order int64   `json:"order"`
+	Order string  `json:"order"`
 	Sum   float64 `json:"sum"`
 }
 
 type BalanceWithdrawals struct {
-	Order       int64   `json:"order"`
+	Order       string  `json:"order"`
 	Sum         float64 `json:"sum"`
 	ProcessedAt string  `json:"processed_at,omitempty"`
 }

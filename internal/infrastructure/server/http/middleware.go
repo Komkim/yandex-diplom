@@ -11,7 +11,7 @@ func (t *Router) AuthMiddleware(next http.Handler) http.Handler {
 
 		token, err := r.Cookie("token")
 		if err != nil {
-			render.Render(w, r, response.ErrInternalServer(err))
+			render.Render(w, r, response.ErrNotAuthenticated)
 			return
 		}
 

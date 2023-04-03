@@ -38,3 +38,4 @@ func ErrInternalServer(err error) render.Renderer {
 
 var RewardRegistered = &Response{HTTPStatusCode: 200, StatusText: "reward successfully registered."}
 var OrderSuccessfully = &Response{HTTPStatusCode: 202, StatusText: "the order has been successfully processed."}
+var OrderNotRegistered = &Response{HTTPStatusCode: 204, StatusText: "the order is not registered in the billing system."}

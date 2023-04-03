@@ -1,15 +1,11 @@
 package application
 
 import (
-	"context"
 	"github.com/google/uuid"
-	"yandex-diplom/internal/domain/aggregate"
-	"yandex-diplom/internal/mistake"
-
-	//"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog"
-	"yandex-diplom/config"
+	"yandex-diplom/internal/domain/aggregate"
+	"yandex-diplom/internal/mistake"
 )
 
 type Services struct {
@@ -19,11 +15,7 @@ type Services struct {
 	log *zerolog.Event
 }
 
-func NewServices(ctx context.Context, cfg *config.Server, log *zerolog.Event) *Services {
-	db, err := newDB(ctx, cfg.DatabaseDSN)
-	if err != nil {
-		log.Err(err)
-	}
+func NewServices(log *zerolog.Event, db *pgxpool.Pool) *Services {
 	us := NewUsersService(db)
 	os := NewOrdersService(db, us.UsersRepo)
 	return &Services{
@@ -32,14 +24,6 @@ func NewServices(ctx context.Context, cfg *config.Server, log *zerolog.Event) *S
 		UsersService:   us,
 		log:            log,
 	}
-}
-
-func newDB(ctx context.Context, connString string) (*pgxpool.Pool, error) {
-	pool, err := pgxpool.New(ctx, connString)
-	if err != nil {
-		return nil, err
-	}
-	return pool, nil
 }
 
 func getUserID(UserRepo aggregate.UsersRepo, login string) (*uuid.UUID, error) {

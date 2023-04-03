@@ -71,8 +71,6 @@ func (t *Router) UserAuthentication(w http.ResponseWriter, r *http.Request) {
 
 	token := t.auth.CreateAuth(data.Login, data.Password)
 
-	render.Render(w, r, response.UserAuthenticated)
-
 	cookie := http.Cookie{
 		Name:    "token",
 		Path:    "/",
@@ -80,6 +78,8 @@ func (t *Router) UserAuthentication(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(time.Hour * CookieLiveHours),
 	}
 	http.SetCookie(w, &cookie)
+
+	render.Render(w, r, response.UserAuthenticated)
 }
 
 func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +104,7 @@ func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
 
 	token, err := r.Cookie("token")
 	if err != nil {
-		render.Render(w, r, response.ErrInternalServer(err))
+		render.Render(w, r, response.ErrNotAuthenticated)
 		t.log.Err(err)
 		return
 	}
@@ -133,7 +133,7 @@ func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
 func (t *Router) OrderGetting(w http.ResponseWriter, r *http.Request) {
 	token, err := r.Cookie("token")
 	if err != nil {
-		render.Render(w, r, response.ErrInternalServer(err))
+		render.Render(w, r, response.ErrNotAuthenticated)
 		t.log.Err(err)
 		return
 	}
@@ -151,7 +151,6 @@ func (t *Router) OrderGetting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//render.Render(w, r, NewOrderResponse(&orders[0]))
 	orderResponse := make([]*response.OrderResponse, 0, len(orders))
 	for _, o := range orders {
 		temp := response.OrderResponse{
@@ -164,18 +163,12 @@ func (t *Router) OrderGetting(w http.ResponseWriter, r *http.Request) {
 	}
 	render.RenderList(w, r, response.NewOrderListResponse(orderResponse))
 
-	//if err := render.RenderList(w, r, NewOrderListResponse(orders)); err != nil {
-	//	render.Render(w, r, ErrInternalServer(err))
-	//	return
-	//}
-
-	//render.Render(w, r, SuccessfulRequestProcessing)
 }
 
 func (t *Router) BalanceCurrent(w http.ResponseWriter, r *http.Request) {
 	token, err := r.Cookie("token")
 	if err != nil {
-		render.Render(w, r, response.ErrInternalServer(err))
+		render.Render(w, r, response.ErrNotAuthenticated)
 		t.log.Err(err)
 		return
 	}
@@ -208,7 +201,13 @@ func (t *Router) WithdrawFounds(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !luna.Valid(data.Order) {
+	number, err := strconv.ParseInt(data.Order, 10, 64)
+	if err != nil {
+		render.Render(w, r, response.ErrInternalServer(err))
+		t.log.Err(err)
+		return
+	}
+	if !luna.Valid(number) {
 		render.Render(w, r, response.OrderInvalidNumber)
 		return
 	}
@@ -258,8 +257,4 @@ func (t *Router) WithdrawInformation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.RenderList(w, r, response.NewOrderSumListResponse(or))
-}
-
-func (t *Router) PointsAccrualsInformation(w http.ResponseWriter, r *http.Request) {
-
 }

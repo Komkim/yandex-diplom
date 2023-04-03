@@ -7,7 +7,7 @@ import (
 
 type OrderResponse struct {
 	//orders storage.Order
-	Number     int64    `json:"number"`
+	Number     string   `json:"number"`
 	Status     string   `json:"status"`
 	Sum        *float64 `json:"sum,omitempty"`
 	UploadedAt string   `json:"uploaded_at"`
@@ -38,7 +38,7 @@ func (o OrderResponse) Render(w http.ResponseWriter, r *http.Request) error {
 }
 
 type OrderSumResponse struct {
-	Order       int64   `json:"order"`
+	Order       string  `json:"order"`
 	Sum         float64 `json:"sum,omitempty"`
 	ProcessedAt string  `json:"processed_at"`
 }
