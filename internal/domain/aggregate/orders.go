@@ -67,10 +67,27 @@ func (o *Orders) GetAllByUser(userID uuid.UUID) ([]entity.Orders, error) {
 	defer cancel()
 
 	var orders = []entity.Orders{}
+	//rows, err := o.db.Query(ctx,
+	//	`select id, user_id, number, status, sum, create_at
+	//		 from orders where user_id = $1
+	//		 order by create_at desc limit 100;`,
+	//	userID,
+	//)
+
 	rows, err := o.db.Query(ctx,
-		`select id, user_id, number, status, sum, create_at 
-			 from orders where user_id = $1 
-    		 order by create_at desc limit 100;`,
+		`
+			with last as (
+				select max(create_at) as m, number
+				from orders
+				where user_id = $1
+				group by number
+			)
+			select o.id, o.user_id, o.number, o.status, o.sum, o.create_at
+			from orders as o,
+				 last
+			where o.create_at in (last.m)
+			  and o.user_id  = $1;
+`,
 		userID,
 	)
 
@@ -131,7 +148,7 @@ func (o *Orders) GetAllByUserWithdrawals(userID uuid.UUID) ([]entity.Orders, err
 			from orders as o,
 				 last
 			where o.create_at in (last.m)
-			  and o.user_id  = $1;
+			  and o.user_id  = $1 and sum < 0;
 		`,
 		userID,
 	)
