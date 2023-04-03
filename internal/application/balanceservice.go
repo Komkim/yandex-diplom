@@ -81,15 +81,12 @@ func (b *BalanceService) GetBalanceWithdraw(login string) (*storage.BalanceWithd
 	return nil, nil
 }
 
-func (b *BalanceService) SetAccrual(accrualOrders []storage.Order, dbOrder map[int64]storage.Order) error {
+func (b *BalanceService) SetAccrual(accrualOrders []storage.OrderAccrual) error {
 f:
 	for _, or := range accrualOrders {
-		num, err := strconv.ParseInt(or.Number, 10, 64)
+		num, err := strconv.ParseInt(or.Order, 10, 64)
 		if err != nil {
 			return err
-		}
-		if or.Status == dbOrder[num].Status {
-			continue f
 		}
 
 		entityOrder, err := b.OrderRepo.GetByNumber(num)
@@ -97,13 +94,17 @@ f:
 			return err
 		}
 
-		err = b.OrderRepo.SetOrder(num, entityOrder.UserID, *or.Accrual, or.Status)
+		if or.Status == entityOrder.Status {
+			continue f
+		}
+
+		err = b.OrderRepo.SetOrder(num, entityOrder.UserID, or.Accrual, or.Status)
 		if err != nil {
 			return err
 		}
 
 		if or.Status == valueobject.PROCESSED {
-			err = b.BalanceRepo.SetSum(entityOrder.UserID, *or.Accrual)
+			err = b.BalanceRepo.SetSum(entityOrder.UserID, or.Accrual)
 			if err != nil {
 				return err
 			}
