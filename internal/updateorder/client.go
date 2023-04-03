@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	SCHEME = "http://"
-	PATH   = "api/orders/"
+	SCHEME = "http"
+	PATH   = "api/orders"
 )
 
 type MyClient struct {
