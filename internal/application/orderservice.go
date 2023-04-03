@@ -72,11 +72,15 @@ func (o *OrdersService) GetOrderWithdrawals(login string) ([]storage.OrderWithdr
 
 	ow := make([]storage.OrderWithdrawals, 0, len(orders))
 	for _, v := range orders {
+		var s float64
+		if v.Sum != nil {
+			s = *v.Sum
+		}
 		ow = append(
 			ow,
 			storage.OrderWithdrawals{
 				Order:       strconv.FormatInt(v.Number, 10),
-				Sum:         *v.Sum,
+				Sum:         s,
 				ProcessedAt: v.CreateAt.Format(time.RFC3339),
 			})
 	}
