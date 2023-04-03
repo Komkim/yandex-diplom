@@ -80,7 +80,7 @@ func (o *OrdersService) GetOrderWithdrawals(login string) ([]storage.OrderWithdr
 			ow,
 			storage.OrderWithdrawals{
 				Order:       strconv.FormatInt(v.Number, 10),
-				Sum:         s,
+				Sum:         -s,
 				ProcessedAt: v.CreateAt.Format(time.RFC3339),
 			})
 	}
