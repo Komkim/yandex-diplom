@@ -3,17 +3,18 @@ package updateorder
 import (
 	"context"
 	"github.com/rs/zerolog"
+	"strconv"
 	"time"
 	"yandex-diplom/config"
 	storage "yandex-diplom/storage/repository"
 )
 
 const (
-	POLL = 30
+	POLL = 5
 )
 
 type AccrualOrder struct {
-	Order   int64   `json:"order"`
+	Order   string  `json:"order"`
 	Status  string  `json:"status"`
 	Accrual float64 `json:"accrual"`
 }
@@ -34,8 +35,10 @@ func NewAccrual(cfg *config.Server, log *zerolog.Event, storage storage.Storage)
 	}
 }
 
-func (a *Accrual) Start() {
-
+func (a *Accrual) Start(ctx context.Context) {
+	orderChan := make(chan []storage.Order)
+	go a.basePoll(ctx, orderChan)
+	go a.sendAccrual(ctx, orderChan)
 }
 
 func (a *Accrual) basePoll(ctx context.Context, orderChan chan []storage.Order) {
@@ -57,7 +60,7 @@ func (a *Accrual) basePoll(ctx context.Context, orderChan chan []storage.Order) 
 	}
 }
 
-func (a *Accrual) sendAccrual(ctx context.Context, orderChan chan []storage.Order, dbChan chan []storage.Order) {
+func (a *Accrual) sendAccrual(ctx context.Context, orderChan chan []storage.Order) {
 
 	for {
 		select {
@@ -66,15 +69,23 @@ func (a *Accrual) sendAccrual(ctx context.Context, orderChan chan []storage.Orde
 			orderMap := make(map[int64]storage.Order)
 		n:
 			for _, o := range orders {
-				order, err := a.MyClient.GetAccrual(o.Number)
+				n, err := strconv.ParseInt(o.Number, 10, 64)
 				if err != nil {
 					a.log.Err(err)
 					continue n
 				}
+				order, err := a.MyClient.GetAccrual(n)
+				if err != nil {
+					a.log.Err(err)
+					continue n
+				}
+				if order == nil {
+					continue n
+				}
 				resultOrders = append(resultOrders, *order)
-				orderMap[order.Number] = *order
+				orderMap[n] = *order
 			}
-			dbChan <- resultOrders
+			//dbChan <- resultOrders
 
 			go func() {
 				err := a.storage.SetAccrual(resultOrders, orderMap)

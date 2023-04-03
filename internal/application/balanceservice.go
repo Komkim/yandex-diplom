@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
+	"strconv"
 	"yandex-diplom/internal/domain/aggregate"
 	"yandex-diplom/internal/domain/valueobject"
 	"yandex-diplom/internal/mistake"
@@ -50,6 +51,11 @@ func (b *BalanceService) SetBalanceWithdraw(withdraw *storage.BalanceWithdraw, l
 		return err
 	}
 
+	num, err := strconv.ParseInt(withdraw.Order, 10, 64)
+	if err != nil {
+		return err
+	}
+
 	current, err := b.BalanceRepo.GetCurrentByUser(*userID)
 	if err != nil {
 		return err
@@ -59,7 +65,7 @@ func (b *BalanceService) SetBalanceWithdraw(withdraw *storage.BalanceWithdraw, l
 	}
 
 	w := -withdraw.Sum
-	err = b.OrderRepo.SetSum(withdraw.Order, *userID, w)
+	err = b.OrderRepo.SetSum(num, *userID, w)
 	if err != nil {
 		return err
 	}
@@ -78,16 +84,20 @@ func (b *BalanceService) GetBalanceWithdraw(login string) (*storage.BalanceWithd
 func (b *BalanceService) SetAccrual(accrualOrders []storage.Order, dbOrder map[int64]storage.Order) error {
 f:
 	for _, or := range accrualOrders {
-		if or.Status == dbOrder[or.Number].Status {
+		num, err := strconv.ParseInt(or.Number, 10, 64)
+		if err != nil {
+			return err
+		}
+		if or.Status == dbOrder[num].Status {
 			continue f
 		}
 
-		entityOrder, err := b.OrderRepo.GetByNumber(or.Number)
+		entityOrder, err := b.OrderRepo.GetByNumber(num)
 		if err != nil {
 			return err
 		}
 
-		err = b.OrderRepo.SetOrder(or.Number, entityOrder.UserID, *or.Accrual, or.Status)
+		err = b.OrderRepo.SetOrder(num, entityOrder.UserID, *or.Accrual, or.Status)
 		if err != nil {
 			return err
 		}
@@ -99,10 +109,6 @@ f:
 			}
 		}
 	}
-
-	//Получаем из базы по номерам все ордера что нам передали. Надо чтобы получить юзеров
-	//Сравниваем все полученные ордера с теми что прислал акруал. Если есть изменения записываем их в ордера
-	//Для ордеров со статуом завершено делаем запись для баланса
 
 	return nil
 }

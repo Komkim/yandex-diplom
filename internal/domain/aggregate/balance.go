@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -54,9 +55,12 @@ func (b *Balance) GetCurrentByUser(userID uuid.UUID) (*float64, error) {
 
 	var current sql.NullFloat64
 	err := b.db.QueryRow(ctx,
-		`select sum(sum) from balance where user_id = $1 group by user_id;`,
+		`select sum(sum) as s from balance where user_id = $1 group by user_id;`,
 		userID,
 	).Scan(current)
+
+	s := userID.String()
+	fmt.Printf(s)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
@@ -77,6 +81,9 @@ func (b *Balance) GetWithdrawntByUser(userID uuid.UUID) (*float64, error) {
 		`select sum(sum) from balance where user_id = $1 and sum < 0 group by user_id;`,
 		userID,
 	).Scan(withdrawn)
+
+	s := userID.String()
+	fmt.Printf(s)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil

@@ -31,7 +31,7 @@ func (c *MyClient) GetAccrual(number int64) (*storage.Order, error) {
 		Scheme: SCHEME,
 		Host:   c.config.AccrualAddress,
 	}
-	p := fmt.Sprintf("%s/{%d}", PATH, number)
+	p := fmt.Sprintf("%s/%d", PATH, number)
 	u = u.JoinPath(p)
 
 	req, err := http.NewRequest(

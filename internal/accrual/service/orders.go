@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
+	"strconv"
 	"yandex-diplom/internal/accrual/model"
 	storage "yandex-diplom/storage/repository"
 )
@@ -22,6 +23,10 @@ func NewAccrualOrdersService(db *pgxpool.Pool, gr model.GoodsRepo, cr model.Conn
 
 func (o *AccrualOrdersService) SetAccrualOrders(ordesSet *storage.AccrualOrdersSet) error {
 	var r float64
+	n, err := strconv.ParseInt(ordesSet.Order, 10, 64)
+	if err != nil {
+		return err
+	}
 
 	for _, good := range ordesSet.Goods {
 		reward, err := o.GoodsRepo.GetReward(good.Description)
@@ -36,13 +41,13 @@ func (o *AccrualOrdersService) SetAccrualOrders(ordesSet *storage.AccrualOrdersS
 			return err
 		}
 
-		err = o.ConnectRepo.SetConnect(ordesSet.Order, *goodsID)
+		err = o.ConnectRepo.SetConnect(n, *goodsID)
 		if err != nil {
 			return err
 		}
 	}
 
-	err := o.OrdersRepo.SetOrders(ordesSet.Order, model.PROCESSED, r)
+	err = o.OrdersRepo.SetOrders(n, model.PROCESSED, r)
 	if err != nil {
 		return err
 	}
@@ -55,9 +60,12 @@ func (o *AccrualOrdersService) GetOrderByNumber(number int64) (*storage.AccrualO
 	if err != nil {
 		return nil, err
 	}
+	if orders == nil {
+		return nil, nil
+	}
 
 	return &storage.AccrualOrders{
-		Order:   orders.Number,
+		Order:   strconv.FormatInt(orders.Number, 10),
 		Status:  orders.Status,
 		Accrual: orders.Reward,
 	}, nil
