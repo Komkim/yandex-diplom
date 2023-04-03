@@ -54,3 +54,22 @@ func NewOrderSumListResponse(orders []*OrderSumResponse) []render.Renderer {
 func (o OrderSumResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
+
+type OrdersResponse struct {
+	Number     string   `json:"number"`
+	Status     string   `json:"status"`
+	Accrual    *float64 `json:"accrual,omitempty"`
+	UploadedAt string   `json:"uploaded_at"`
+}
+
+func NewOrdersListResponse(orders []*OrdersResponse) []render.Renderer {
+	list := []render.Renderer{}
+	for _, order := range orders {
+		list = append(list, order)
+	}
+	return list
+}
+
+func (o OrdersResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}

@@ -151,17 +151,17 @@ func (t *Router) OrderGetting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orderResponse := make([]*response.OrderResponse, 0, len(orders))
+	orderResponse := make([]*response.OrdersResponse, 0, len(orders))
 	for _, o := range orders {
-		temp := response.OrderResponse{
+		temp := response.OrdersResponse{
 			Number:     o.Number,
 			Status:     o.Status,
-			Sum:        o.Accrual,
+			Accrual:    o.Accrual,
 			UploadedAt: o.UploadedAt,
 		}
 		orderResponse = append(orderResponse, &temp)
 	}
-	render.RenderList(w, r, response.NewOrderListResponse(orderResponse))
+	render.RenderList(w, r, response.NewOrdersListResponse(orderResponse))
 
 }
 
