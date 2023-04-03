@@ -83,7 +83,6 @@ func (a *Accrual) sendAccrual(ctx context.Context, orderChan chan []storage.Orde
 				}
 				resultOrders = append(resultOrders, *order)
 			}
-			//dbChan <- resultOrders
 
 			go func() {
 				err := a.storage.SetAccrual(resultOrders)
