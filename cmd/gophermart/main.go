@@ -34,8 +34,6 @@ func main() {
 		logger.Error().Err(err)
 	}
 
-	log.Print(cfg)
-
 	err = startMigration(cfg.Server.DatabaseDSN)
 	if err != nil {
 		logger.Error().Err(err)

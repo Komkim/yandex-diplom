@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/go-chi/render"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -83,6 +84,7 @@ func (t *Router) UserAuthentication(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *Router) OrderLoading(w http.ResponseWriter, r *http.Request) {
+	log.Print(t.cfg)
 	var buf bytes.Buffer
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
