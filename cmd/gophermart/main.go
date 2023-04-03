@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog/log"
@@ -35,7 +34,7 @@ func main() {
 		logger.Error().Err(err)
 	}
 
-	fmt.Println(cfg)
+	log.Print(cfg)
 
 	err = startMigration(cfg.Server.DatabaseDSN)
 	if err != nil {
