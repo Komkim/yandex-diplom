@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pressly/goose/v3"
 	"os"
@@ -26,7 +27,6 @@ func main() {
 		logger.Error().Err(err)
 		return
 	}
-	logger.Info().Msgf("Config %v", cfg)
 
 	err = startMigration(cfg.DatabaseDSN)
 	if err != nil {
