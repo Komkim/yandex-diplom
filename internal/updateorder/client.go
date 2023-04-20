@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"yandex-diplom/config"
 	storage "yandex-diplom/storage/repository"
 )
@@ -27,9 +28,20 @@ func NewClient(config *config.Server) *MyClient {
 }
 
 func (c *MyClient) GetAccrual(number int64) (*storage.OrderAccrual, error) {
+	cfgAddr := strings.Split(c.config.AccrualAddress, "://")
+	var scheme string
+	var host string
+	if len(cfgAddr) > 1 {
+		scheme = cfgAddr[0]
+		host = cfgAddr[1]
+	}
+	if len(cfgAddr) == 1 {
+		scheme = SCHEME
+		host = cfgAddr[0]
+	}
 	u := &url.URL{
-		Scheme: SCHEME,
-		Host:   c.config.AccrualAddress,
+		Scheme: scheme,
+		Host:   host,
 	}
 	p := fmt.Sprintf("%s/%d", PATH, number)
 	u = u.JoinPath(p)
