@@ -26,6 +26,7 @@ func main() {
 		logger.Error().Err(err)
 		return
 	}
+	logger.Info().Msgf("Config %v", cfg)
 
 	err = startMigration(cfg.DatabaseDSN)
 	if err != nil {
