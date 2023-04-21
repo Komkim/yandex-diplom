@@ -11,7 +11,7 @@ import (
 const skipTestMessage = "Skip test. please up local database for this test"
 
 func getTestDB(req *require.Assertions) *pgxpool.Pool {
-	ctx, _ := context.WithCancel(context.Background())
+	ctx := context.Background()
 
 	type cfg struct {
 		Dsn *config.Server
@@ -30,7 +30,6 @@ func getTestDB(req *require.Assertions) *pgxpool.Pool {
 func getTestUserRepo(db *pgxpool.Pool) UsersRepo {
 	return NewUsersRepo(db)
 }
-
 func getTestOrderRepo(db *pgxpool.Pool) OrdersRepo {
 	return NewOrdersRepo(db)
 }
