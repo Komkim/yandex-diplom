@@ -6,33 +6,33 @@ import (
 )
 
 type Fixture interface {
-	GetUserSql() []string
-	GetOrderSql() []string
-	GetBalanceSql() []string
+	GetUserSQL() []string
+	GetOrderSQL() []string
+	GetBalanceSQL() []string
 }
 
 type CleanupFixture struct{}
 
-func (cf CleanupFixture) GetUserSql() []string {
+func (cf CleanupFixture) GetUserSQL() []string {
 	return []string{
 		`TRUNCATE TABLE users RESTART IDENTITY CASCADE;`,
 	}
 }
 
-func (cf CleanupFixture) GetOrderSql() []string {
+func (cf CleanupFixture) GetOrderSQL() []string {
 	return []string{
 		`TRUNCATE TABLE orders RESTART IDENTITY CASCADE;`,
 	}
 }
 
-func (cf CleanupFixture) GetBalanceSql() []string {
+func (cf CleanupFixture) GetBalanceSQL() []string {
 	return []string{
 		`TRUNCATE TABLE balance RESTART IDENTITY CASCADE;`,
 	}
 }
 
 func ExecuteFixture(ctx context.Context, db *pgxpool.Pool, fixture Fixture) {
-	for _, query := range fixture.GetUserSql() {
+	for _, query := range fixture.GetUserSQL() {
 		_, err := db.Exec(ctx, query)
 
 		if err != nil {
@@ -40,14 +40,14 @@ func ExecuteFixture(ctx context.Context, db *pgxpool.Pool, fixture Fixture) {
 		}
 	}
 
-	for _, query := range fixture.GetOrderSql() {
+	for _, query := range fixture.GetOrderSQL() {
 		_, err := db.Exec(ctx, query)
 
 		if err != nil {
 			panic(err)
 		}
 	}
-	for _, query := range fixture.GetBalanceSql() {
+	for _, query := range fixture.GetBalanceSQL() {
 		_, err := db.Exec(ctx, query)
 
 		if err != nil {
