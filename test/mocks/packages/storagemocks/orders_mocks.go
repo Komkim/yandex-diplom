@@ -5,9 +5,10 @@
 package storagemocks
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 	repository "yandex-diplom/storage/repository"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockOrders is a mock of Orders interface

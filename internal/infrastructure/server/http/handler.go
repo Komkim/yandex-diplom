@@ -3,7 +3,6 @@ package router
 import (
 	"bytes"
 	"errors"
-	"github.com/go-chi/render"
 	"net/http"
 	"strconv"
 	"time"
@@ -11,6 +10,8 @@ import (
 	"yandex-diplom/internal/infrastructure/server/http/response"
 	"yandex-diplom/internal/mistake"
 	"yandex-diplom/pkg/luna"
+
+	"github.com/go-chi/render"
 )
 
 const CookieLiveHours = 60

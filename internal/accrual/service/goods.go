@@ -1,9 +1,10 @@
 package service
 
 import (
-	"github.com/jackc/pgx/v5/pgxpool"
 	"yandex-diplom/internal/accrual/model"
 	storage "yandex-diplom/storage/repository"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type GoodsService struct {

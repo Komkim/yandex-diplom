@@ -1,10 +1,11 @@
 package service
 
 import (
-	"github.com/jackc/pgx/v5/pgxpool"
 	"strconv"
 	"yandex-diplom/internal/accrual/model"
 	storage "yandex-diplom/storage/repository"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type AccrualOrdersService struct {

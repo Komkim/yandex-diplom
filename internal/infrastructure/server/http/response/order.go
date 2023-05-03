@@ -1,8 +1,9 @@
 package response
 
 import (
-	"github.com/go-chi/render"
 	"net/http"
+
+	"github.com/go-chi/render"
 )
 
 type OrderResponse struct {

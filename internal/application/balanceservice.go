@@ -1,12 +1,13 @@
 package application
 
 import (
-	"github.com/jackc/pgx/v5/pgxpool"
 	"strconv"
 	"yandex-diplom/internal/domain/aggregate"
 	"yandex-diplom/internal/domain/valueobject"
 	"yandex-diplom/internal/mistake"
 	storage "yandex-diplom/storage/repository"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type BalanceService struct {

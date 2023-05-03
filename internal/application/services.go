@@ -1,11 +1,12 @@
 package application
 
 import (
+	"yandex-diplom/internal/domain/aggregate"
+	"yandex-diplom/internal/mistake"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog"
-	"yandex-diplom/internal/domain/aggregate"
-	"yandex-diplom/internal/mistake"
 )
 
 type Services struct {

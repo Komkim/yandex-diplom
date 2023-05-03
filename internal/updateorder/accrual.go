@@ -2,11 +2,12 @@ package updateorder
 
 import (
 	"context"
-	"github.com/rs/zerolog"
 	"strconv"
 	"time"
 	"yandex-diplom/config"
 	storage "yandex-diplom/storage/repository"
+
+	"github.com/rs/zerolog"
 )
 
 const (

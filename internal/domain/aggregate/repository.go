@@ -1,8 +1,9 @@
 package aggregate
 
 import (
-	"github.com/google/uuid"
 	"yandex-diplom/internal/domain/entity"
+
+	"github.com/google/uuid"
 )
 
 const DBTIMEOUT = 5

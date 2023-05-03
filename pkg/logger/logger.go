@@ -1,9 +1,10 @@
 package mylogger
 
 import (
-	"github.com/rs/zerolog"
 	"os"
 	"time"
+
+	"github.com/rs/zerolog"
 )
 
 var Logger *zerolog.Logger

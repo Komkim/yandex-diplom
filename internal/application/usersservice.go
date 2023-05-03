@@ -1,10 +1,11 @@
 package application
 
 import (
-	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/vzglad-smerti/password_hash"
 	"yandex-diplom/internal/domain/aggregate"
 	"yandex-diplom/internal/mistake"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+	password "github.com/vzglad-smerti/password_hash"
 )
 
 type UsersService struct {

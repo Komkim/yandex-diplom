@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/jackc/pgx/v5/pgxpool"
-	_ "github.com/lib/pq"
-	"github.com/rs/zerolog/log"
 	"os"
 	"yandex-diplom/internal/infrastructure/server/auth"
 	"yandex-diplom/internal/updateorder"
-	"yandex-diplom/pkg/logger"
+	mylogger "yandex-diplom/pkg/logger"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+	_ "github.com/lib/pq"
+	"github.com/rs/zerolog/log"
 
 	"os/signal"
 	"syscall"
@@ -19,8 +20,9 @@ import (
 	router "yandex-diplom/internal/infrastructure/server/http"
 
 	//_ "github.com/jackc/pgx/v5"
-	"github.com/pressly/goose/v3"
 	_ "yandex-diplom/storage/postgres/migrations/gophermart"
+
+	"github.com/pressly/goose/v3"
 )
 
 func main() {

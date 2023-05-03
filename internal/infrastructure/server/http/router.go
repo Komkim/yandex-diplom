@@ -1,14 +1,15 @@
 package router
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/rs/zerolog"
 	"net/http"
 	"time"
 	"yandex-diplom/config"
 	"yandex-diplom/internal/infrastructure/server/auth"
 	storage "yandex-diplom/storage/repository"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/rs/zerolog"
 )
 
 type Router struct {

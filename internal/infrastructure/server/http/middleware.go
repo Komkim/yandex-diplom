@@ -1,9 +1,10 @@
 package router
 
 import (
-	"github.com/go-chi/render"
 	"net/http"
 	"yandex-diplom/internal/infrastructure/server/http/response"
+
+	"github.com/go-chi/render"
 )
 
 func (t *Router) AuthMiddleware(next http.Handler) http.Handler {

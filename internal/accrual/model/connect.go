@@ -2,10 +2,11 @@ package model
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
 	"yandex-diplom/internal/mistake"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type ModelConnect struct {

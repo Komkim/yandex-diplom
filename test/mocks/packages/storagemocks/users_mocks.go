@@ -5,8 +5,9 @@
 package storagemocks
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockUsers is a mock of Users interface

@@ -2,9 +2,10 @@ package server
 
 import (
 	"context"
-	"github.com/rs/zerolog"
 	"net/http"
 	"yandex-diplom/config"
+
+	"github.com/rs/zerolog"
 )
 
 type Server struct {

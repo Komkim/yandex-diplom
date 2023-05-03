@@ -2,13 +2,14 @@ package aggregate
 
 import (
 	"context"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"yandex-diplom/internal/domain/entity"
 	"yandex-diplom/test/fixtures"
+
+	"github.com/stretchr/testify/require"
 )
 
-func TestRepositoryDB_InsertUser(t *testing.T) {
+func TestRepositoryDB_SetOne(t *testing.T) {
 	if testing.Short() {
 		t.Skip(skipTestMessage)
 	}
@@ -46,7 +47,7 @@ func TestRepositoryDB_InsertUser(t *testing.T) {
 	t.Run("insert user", test("user", "password"))
 }
 
-func TestRepositoryDB_SelectUser(t *testing.T) {
+func TestRepositoryDB_GetOne(t *testing.T) {
 	if testing.Short() {
 		t.Skip(skipTestMessage)
 	}

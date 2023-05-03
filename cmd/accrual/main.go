@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/pressly/goose/v3"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,6 +11,9 @@ import (
 	accrualrouter "yandex-diplom/internal/accrual/server/http"
 	"yandex-diplom/internal/accrual/service"
 	mylogger "yandex-diplom/pkg/logger"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/pressly/goose/v3"
 )
 
 func main() {
